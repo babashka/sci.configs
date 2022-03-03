@@ -1,12 +1,10 @@
 # SCI configs
 
-A collection of SCI configuration for the following libraries:
+A collection of ready to be used SCI configs.
 
-This repository only provides the config on the classpath and library consumers
-are meant to declare their own dependencies.
-
-See the `:dev` alias to check against which version of the libraries the
-configurations are tested.
+This repository provides SCI configurations on the classpath. See the `:dev`
+alias to check against which version of the libraries the configurations are
+tested. You should bring in the dependency of targetted libraries yourself.
 
 In general, a configuration can be enabled as in the following example for `applied-science.js-interop`:
 
