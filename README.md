@@ -35,7 +35,7 @@ or if you like to include the config in advanced (e.g. for performance reasons),
 
 ## API
 
-In general, only `*-namespace` and `library/config` vars are intented as the
+In general, only `library/*-namespace` and `library/config` vars are intented as the
 public API. The rest is subject to breakage, even when vars are public. For
 convenience, we list the public API for each library here.
 
