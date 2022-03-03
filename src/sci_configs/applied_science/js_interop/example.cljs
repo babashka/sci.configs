@@ -10,5 +10,3 @@
 (def sci-ctx (sci/init sci-opts))
 
 (sci/eval-string* sci-ctx "(require '[applied-science.js-interop :as j]) (j/assoc! #js {} :foo 1)")
-
-
