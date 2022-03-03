@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+    <title>replit</title>
+    <link href="style.css" rel="stylesheet" type="text/css" />
+  </head>
+  <body>
+    <script src="script.js"></script>
+  </body>
+</html>
+<!DOCTYPE html>
+<!-- ICS2O-Unit1-04-HTML-CSS -->
+<html lang="en-ca">
+<head>
+<meta charset="utf-8">
+<meta name="description" content="My first webpage, with CSS"><title>My first webpage, with proper style</title>
+</head>
+<style>
+#myHeader {
+background-color: rgb(255, 165, 0);
+color: hsl(147, 50%, 47%);
+padding: 10px;
+text-align: center;
+  </style>
+  </style>
+<body style="background-color:powderblue;">
+  <h1 id="myHeader">Style is important</h1>
+    
+<meta name="keywords" content="mths, ics2o">
+<meta name="author" content="Mr. Coxall">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="./css/style.css">
+<title>My first webpage, with CSS</title>
+</head>
+<body>
+
+  <p style="background-color:#ff00ff;"> Proper HTML style is important</p>
+<img src="https://media.geeksforgeeks.org/wp-content/cdn-uploads/20191217202846/Programming-for-Beginners-10-Best-HTML-Coding-Practices-You-Must-Know.png" alt="Programming For Beginners: 10 Best HTML Coding Practices You Must Know -  GeeksforGeeks" jsaction="load:XAeZkd;" jsname="HiaYvf" class="n3VNCb" data-noaft="1" style="width: 435px; height: 258.462px; margin: 0px;">
+
+</p>
+</body>  <p style="background-color:#ff00ff;">MY INDOC2 HIML PAGS</p>
+  
+</html>
