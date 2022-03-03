@@ -2,9 +2,6 @@
 
 A collection of SCI configuration for the following libraries:
 
-* [applied-science/js-interop](https://github.com/applied-science/js-interop)
-* [reagent](https://github.com/reagent-project/reagent)
-
 This repository only provides the config on the classpath and library consumers
 are meant to declare their own dependencies.
 
@@ -36,15 +33,17 @@ or if you like to include the config in advanced (e.g. for performance reasons),
 (def sci-ctx (sci/init {:namespaces {'applied-science.js-interop j/js-interop-namespace}}))
 ```
 
-The configurations are licensed under the same licenses as the libraries they target.
-
 ## API
 
 In general, only `*-namespace` and `library/config` vars are intented as the
 public API. The rest is subject to breakage, even when vars are public. For
 convenience, we list the public API for each library here.
 
-### applied-science/js-interop
+The configurations are licensed under the same licenses as the libraries they target.
+
+## Libraries
+
+### [applied-science/js-interop](https://github.com/applied-science/js-interop)
 
 Namespace: `sci-configs.reagent.reagent`
 
@@ -53,7 +52,7 @@ Public API:
 - `config`
 - `js-interop-namespace`
 
-### reagent/reagent
+### [reagent/reagent](https://github.com/reagent-project/reagent)
 
 Namespace: `sci-configs.reagent.reagent`
 
@@ -63,3 +62,5 @@ Public API:
 - `reagent-namespace`
 - `reagent-ratom-namespace`
 - `reagent-debug-namespace`
+
+## License
