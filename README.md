@@ -35,3 +35,5 @@ or if you like to include the config in advanced (e.g. for performance reasons),
 
 (def sci-ctx (sci/init {:namespaces {'applied-science.js-interop j/js-interop-namespace}}))
 ```
+
+The configurations are licensed under the same licenses as the libraries they target.
