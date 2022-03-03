@@ -37,3 +37,29 @@ or if you like to include the config in advanced (e.g. for performance reasons),
 ```
 
 The configurations are licensed under the same licenses as the libraries they target.
+
+## API
+
+In general, only `*-namespace` and `library/config` vars are intented as the
+public API. The rest is subject to breakage, even when vars are public. For
+convenience, we list the public API for each library here.
+
+### applied-science/js-interop
+
+Namespace: `sci-configs.reagent.reagent`
+
+Public API:
+
+- `config`
+- `js-interop-namespace`
+
+### reagent/reagent
+
+Namespace: `sci-configs.reagent.reagent`
+
+Public API:
+
+- `config`
+- `reagent-namespace`
+- `reagent-ratom-namespace`
+- `reagent-debug-namespace`
