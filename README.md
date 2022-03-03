@@ -21,7 +21,8 @@ In general, a configuration can be enabled as in the following example for `appl
 ;;=> #js {:foo 1}
 ```
 
-or if you like to include the config in advanced (e.g. for performance reasons), use the per-namespace values:
+or if you like to include the config without calling `sci/merge-opts` (e.g. for
+performance reasons), use the per-namespace values directly:
 
 ``` clojure
 (ns example
