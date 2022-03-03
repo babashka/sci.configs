@@ -1,4 +1,4 @@
-(ns nextjournal.sci-configs.js-interop
+(ns sci-configs.applied-science.js-interop.config
   (:refer-clojure :exclude [let fn defn spread])
   (:require
    [applied-science.js-interop :as j]
