@@ -1,6 +1,8 @@
 Copyright 2022 Michiel Borkent and contributors.
 
-The configurations are licensed under the same licenses as the libraries they target.
+The configurations are licensed under the same licenses as the libraries they
+target. You are free to take the configs from this repository and adapt them as
+necessary for your projects.
 
 THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH
 REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND

@@ -73,4 +73,6 @@ Public API:
 
 ## License
 
-The configurations are licensed under the same licenses as the libraries they target.
+The configurations are licensed under the same licenses as the libraries they
+target. You are free to take the configs from this repository and adapt them as
+necessary for your projects. See LICENSE for additional info.
