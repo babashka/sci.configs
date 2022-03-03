@@ -28,7 +28,7 @@ In general, a configuration can be enabled as in the following example for `appl
 
 or if you like to include the config in advanced (e.g. for performance reasons), use the per-namespace values:
 
-```
+``` clojure
 (ns example
   (:require [sci-configs.applied-science.js-interop :as j]
             [sci.core :as sci]))
