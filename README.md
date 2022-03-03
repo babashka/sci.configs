@@ -39,8 +39,6 @@ In general, only `library/*-namespace` and `library/config` vars are intented as
 public API. The rest is subject to breakage, even when vars are public. For
 convenience, we list the public API for each library here.
 
-The configurations are licensed under the same licenses as the libraries they target.
-
 ## Libraries
 
 ### [applied-science/js-interop](https://github.com/applied-science/js-interop)
@@ -64,3 +62,5 @@ Public API:
 - `reagent-debug-namespace`
 
 ## License
+
+The configurations are licensed under the same licenses as the libraries they target.
