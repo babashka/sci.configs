@@ -1,4 +1,4 @@
-(ns sci-configs.applied-science.js-interop.config
+(ns sci-configs.applied-science.js-interop
   (:refer-clojure :exclude [let fn defn spread])
   (:require
    [applied-science.js-interop :as j]
