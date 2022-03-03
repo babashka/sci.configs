@@ -71,6 +71,15 @@ Public API:
 - `reagent-ratom-namespace`
 - `reagent-debug-namespace`
 
+The configuration for `reagent.dom.server` is available seperately via:
+
+Namespace: `sci-configs.reagent.reagent-dom-server`
+
+Public API:
+
+- `config`
+- `reagent-dom-server-namespace`
+
 ## License
 
 The configurations are licensed under the same licenses as the libraries they
