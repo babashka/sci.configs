@@ -50,6 +50,16 @@ Public API:
 - `config`
 - `js-interop-namespace`
 
+### [funcool/promesa](https://github.com/funcool/promesa)
+
+Namespace: `sci-configs.funcool.promesa`
+
+Public API:
+
+- `config`
+- `promesa-namespace`
+- `promesa-protocols-namespace`
+
 ### [reagent/reagent](https://github.com/reagent-project/reagent)
 
 Namespace: `sci-configs.reagent.reagent`
