@@ -4,7 +4,7 @@ A collection of ready to be used SCI configs.
 
 This repository provides SCI configurations on the classpath. See the `:dev`
 alias to check against which version of the libraries the configurations are
-tested. You should bring in the dependency of targetted libraries yourself.
+tested. You should bring in the dependency of targeted libraries yourself.
 
 In general, a configuration can be enabled as in the following example for `applied-science.js-interop`:
 
