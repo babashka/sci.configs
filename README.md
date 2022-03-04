@@ -42,7 +42,7 @@ convenience, we list the public API for each library here.
 
 ### [applied-science/js-interop](https://github.com/applied-science/js-interop)
 
-Namespace: `sci-configs.reagent.reagent`
+Namespace: `sci-configs.applied-science.js-interop`
 
 Public API:
 
