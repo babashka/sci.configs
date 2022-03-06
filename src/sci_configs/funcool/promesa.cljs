@@ -1,5 +1,5 @@
 (ns sci-configs.funcool.promesa
-  (:refer-clojure :exclude [delay spread promise
+  (:refer-clojure :exclude [delay do spread promise
                             await map mapcat run!
                             future let loop recur -> ->>
                             with-redefs])
@@ -104,7 +104,9 @@
                  ~@(c/map bind-value resets)))))))
 
 (def promesa-namespace
-  {'do! (sci/copy-var do! pns)
+  {'create (sci/copy-var p/create pns)
+   'do (sci/copy-var do! pns)
+   'do! (sci/copy-var do! pns)
    'let (sci/copy-var let pns)
    'all (sci/copy-var p/all pns)
    'any (sci/copy-var p/any pns)
