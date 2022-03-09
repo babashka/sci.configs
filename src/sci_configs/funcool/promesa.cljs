@@ -110,6 +110,8 @@
    'let (sci/copy-var let pns)
    'all (sci/copy-var p/all pns)
    'any (sci/copy-var p/any pns)
+   'map (sci/copy-var p/map pns)
+   'mapcat (sci/copy-var p/mapcat pns)
    'resolved (sci/copy-var p/resolved pns)
    'rejected (sci/copy-var p/rejected pns)
    'deferred (sci/copy-var p/deferred pns)
