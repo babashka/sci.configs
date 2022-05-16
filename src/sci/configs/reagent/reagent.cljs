@@ -1,4 +1,4 @@
-(ns sci-configs.reagent.reagent
+(ns sci.configs.reagent.reagent
   (:require
    [reagent.core :as r]
    [reagent.debug :as d :refer-macros [dev?]]

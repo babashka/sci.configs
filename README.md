@@ -10,7 +10,7 @@ In general, a configuration can be enabled as in the following example for `appl
 
 ``` clojure
 (ns example
-  (:require [sci-configs.applied-science.js-interop :as j]
+  (:require [sci.configs.applied-science.js-interop :as j]
             [sci.core :as sci]))
 
 (def sci-ctx (doto (sci/init {}) ;; your initial config here
@@ -26,7 +26,7 @@ performance reasons), use the per-namespace values directly:
 
 ``` clojure
 (ns example
-  (:require [sci-configs.applied-science.js-interop :as j]
+  (:require [sci.configs.applied-science.js-interop :as j]
             [sci.core :as sci]))
 
 (def sci-ctx (sci/init {:namespaces {'applied-science.js-interop j/js-interop-namespace}}))
@@ -42,7 +42,7 @@ convenience, we list the public API for each library here.
 
 ### [applied-science/js-interop](https://github.com/applied-science/js-interop)
 
-Namespace: `sci-configs.applied-science.js-interop`
+Namespace: `sci.configs.applied-science.js-interop`
 
 Public API:
 
@@ -51,7 +51,7 @@ Public API:
 
 ### [funcool/promesa](https://github.com/funcool/promesa)
 
-Namespace: `sci-configs.funcool.promesa`
+Namespace: `sci.configs.funcool.promesa`
 
 Public API:
 
@@ -61,7 +61,7 @@ Public API:
 
 ### [reagent/reagent](https://github.com/reagent-project/reagent)
 
-Namespace: `sci-configs.reagent.reagent`
+Namespace: `sci.configs.reagent.reagent`
 
 Public API:
 
@@ -72,7 +72,7 @@ Public API:
 
 The configuration for `reagent.dom.server` is available seperately via:
 
-Namespace: `sci-configs.reagent.reagent-dom-server`
+Namespace: `sci.configs.reagent.reagent-dom-server`
 
 Public API:
 

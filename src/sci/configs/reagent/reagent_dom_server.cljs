@@ -1,4 +1,4 @@
-(ns sci-configs.reagent.reagent-dom-server
+(ns sci.configs.reagent.reagent-dom-server
   (:require [reagent.dom.server :as srv]
             [sci.core :as sci]))
 

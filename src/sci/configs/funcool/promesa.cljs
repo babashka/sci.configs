@@ -1,10 +1,12 @@
-(ns sci-configs.funcool.promesa
-  (:refer-clojure :exclude [delay do spread promise
+(ns sci.configs.funcool.promesa
+  (:refer-clojure :exclude [delay spread promise
+
                             await map mapcat run!
                             future let loop recur -> ->>
                             with-redefs])
   (:require [clojure.core :as c]
             [promesa.core :as p]
+            [promesa.exec :as exec]
             [promesa.protocols :as pt]
             [sci.core :as sci]))
 
@@ -103,6 +105,9 @@
                (fn []
                  ~@(c/map bind-value resets)))))))
 
+(def ^:private
+  loop-run-fn (sci/new-dynamic-var '*loop-run-fn* exec/run! {:ns pns}))
+
 (def promesa-namespace
   {'create (sci/copy-var p/create pns)
    'do (sci/copy-var do! pns)
@@ -115,6 +120,7 @@
    'resolved (sci/copy-var p/resolved pns)
    'rejected (sci/copy-var p/rejected pns)
    'deferred (sci/copy-var p/deferred pns)
+   'handle (sci/copy-var p/handle pns)
    'promise  (sci/copy-var p/promise pns)
    'promise? (sci/copy-var p/promise? pns)
    'thenable? (sci/copy-var p/thenable? pns)
@@ -129,10 +135,15 @@
    'catch   (sci/copy-var p/catch pns)
    'finally (sci/copy-var p/finally pns)
    'race    (sci/copy-var p/race pns)
+   'reject! (sci/copy-var p/reject! pns)
+   'resolve! (sci/copy-var p/resolve! pns)
    'run!    (sci/copy-var p/run! pns)
    '->      (sci/copy-var -> pns)
    '->>      (sci/copy-var ->> pns)
-   'with-redefs (sci/copy-var with-redefs pns)})
+   'with-redefs (sci/copy-var with-redefs pns)
+   '*loop-run-fn* loop-run-fn
+   'loop (sci/copy-var p/loop pns)
+   'recur (sci/copy-var p/recur pns)})
 
 (def promesa-protocols-namespace
   {'-bind (sci/copy-var pt/-bind ptns)
