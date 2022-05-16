@@ -67,7 +67,8 @@
    'with-let (sci/copy-var with-let rns)
    'cursor (sci/copy-var r/cursor rns)
    'create-class (sci/copy-var r/create-class rns)
-   'create-compiler (sci/copy-var r/create-compiler rns)})
+   'create-compiler (sci/copy-var r/create-compiler rns)
+   'reactify-component (sci/copy-var r/reactify-component rns)})
 
 (def rtmns (sci/create-ns 'reagent.ratom nil))
 
@@ -79,7 +80,12 @@
 (def reagent-ratom-namespace
   {'with-let-values (sci/copy-var ratom/with-let-values rtmns)
    'reactive? (sci/copy-var ratom/reactive? rtmns)
-   '-ratom-context (sci/copy-var -ratom-context rtmns)})
+   '-ratom-context (sci/copy-var -ratom-context rtmns)
+   'atom (sci/copy-var reagent.ratom/atom
+                       rns)
+   'make-reaction (sci/copy-var reagent.ratom/make-reaction
+                                rns)
+   'track! (sci/copy-var reagent.ratom/track! rns)})
 
 (def rdbgns (sci/create-ns 'reagent.debug nil))
 
