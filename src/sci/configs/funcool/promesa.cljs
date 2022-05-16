@@ -108,6 +108,41 @@
 (def ^:private
   loop-run-fn (sci/new-dynamic-var '*loop-run-fn* exec/run! {:ns pns}))
 
+(defn ^:macro loop
+  [_ _ bindings & body]
+  (c/let [bindings (partition 2 2 bindings)
+          names (mapv first bindings)
+          fvals (mapv second bindings)
+          tsym (gensym "loop")
+          dsym (gensym "deferred")
+          rsym (gensym "run")]
+    `(c/let [~rsym promesa.core/*loop-run-fn*
+             ~dsym (promesa.core/deferred)
+             ~tsym (fn ~tsym [params#]
+                     (c/-> (promesa.core/all params#)
+                           (promesa.core/then (fn [[~@names]]
+                                                ;; (prn "exec" ~@names)
+                                                (promesa.core/do! ~@body)))
+                           (promesa.core/handle
+                            (fn [res# err#]
+                              ;; (prn "result" res# err#)
+                              (cond
+                                (not (nil? err#))
+                                (promesa.core/reject! ~dsym err#)
+
+                                (and (map? res#) (= (:type res#) :promesa.core/recur))
+                                (do (~rsym (fn [] (~tsym (:args res#))))
+                                    nil)
+
+                                :else
+                                (promesa.core/resolve! ~dsym res#))))))]
+       (~rsym (fn [] (~tsym ~fvals)))
+       ~dsym)))
+
+(defn ^:macro recur
+  [_ _ & args]
+  `(array-map :type :promesa.core/recur :args [~@args]))
+
 (def promesa-namespace
   {'create (sci/copy-var p/create pns)
    'do (sci/copy-var do! pns)
@@ -142,8 +177,8 @@
    '->>      (sci/copy-var ->> pns)
    'with-redefs (sci/copy-var with-redefs pns)
    '*loop-run-fn* loop-run-fn
-   'loop (sci/copy-var p/loop pns)
-   'recur (sci/copy-var p/recur pns)})
+   'loop (sci/copy-var loop pns)
+   'recur (sci/copy-var recur pns)})
 
 (def promesa-protocols-namespace
   {'-bind (sci/copy-var pt/-bind ptns)
