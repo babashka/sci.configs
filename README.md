@@ -48,6 +48,7 @@ Public API:
 
 - `config`
 - `js-interop-namespace`
+- `namespaces`
 
 ### [funcool/promesa](https://github.com/funcool/promesa)
 
@@ -58,6 +59,7 @@ Public API:
 - `config`
 - `promesa-namespace`
 - `promesa-protocols-namespace`
+- `namespaces`
 
 ### [reagent/reagent](https://github.com/reagent-project/reagent)
 
@@ -69,6 +71,7 @@ Public API:
 - `reagent-namespace`
 - `reagent-ratom-namespace`
 - `reagent-debug-namespace`
+- `namespaces`
 
 The configuration for `reagent.dom.server` is available seperately via:
 
@@ -78,6 +81,16 @@ Public API:
 
 - `config`
 - `reagent-dom-server-namespace`
+
+### [mfikes/cljs-bean](https://github.com/mfikes/cljs-bean)
+
+Namespace: `sci.configs.mfikes.cljs-bean`
+
+Public API:
+
+- `config`
+- `namespaces`
+- `cljs-bean-namespace`
 
 ## License
 

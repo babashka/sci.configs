@@ -184,5 +184,7 @@
   {'-bind (sci/copy-var pt/-bind ptns)
    '-promise (sci/copy-var pt/-promise ptns)})
 
-(def config {:namespaces {'promesa.core promesa-namespace
-                          'promesa.protocols promesa-protocols-namespace}})
+(def namespaces {'promesa.core promesa-namespace
+                 'promesa.protocols promesa-protocols-namespace})
+
+(def config {:namespaces namespaces})
