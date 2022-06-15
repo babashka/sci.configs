@@ -92,6 +92,18 @@ Public API:
 - `namespaces`
 - `cljs-bean-namespace`
 
+### [cljs.test](https://cljs.github.io/api/cljs.test/)
+
+Namespace `sci.configs.cljs.test`
+
+Public API:
+
+``` clojure
+- `config`
+- `namespaces`
+- `cljs-test-namespace`
+```
+
 ## License
 
 The configurations are licensed under the same licenses as the libraries they

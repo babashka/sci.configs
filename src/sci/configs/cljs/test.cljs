@@ -17,6 +17,7 @@
 (ns
     ^{:author "Stuart Sierra, with contributions and suggestions by
   Chas Emerick, Allen Rohner, and Stuart Halloway",
+      :no-doc true
       :doc "A unit testing framework.
 
    ASSERTIONS
@@ -1083,10 +1084,7 @@
   (when-not (successful? m)
     (set! (.-exitCode js/process) 1)))
 
-(defn new-var [var-sym f]
-  (sci/new-var var-sym f {:ns tns}))
-
-(defn with-ctx [sci-var]
+(defn- with-ctx [sci-var]
   (doto sci-var
     (alter-meta! assoc :sci.impl/op needs-ctx)))
 
@@ -1131,3 +1129,6 @@
    'get-current-env (sci/copy-var get-current-env tns)
    'run-tests (with-ctx (sci/copy-var run-tests tns))
    'successful? (sci/copy-var successful? tns)})
+
+(def namespaces {'cljs.test cljs-test-namespace})
+(def config {:namespaces namespaces})
