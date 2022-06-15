@@ -231,7 +231,7 @@
 
    For additional event types, see the examples in the code.
 "}
-    sci.configs.impl.clojure.test
+    sci.configs.cljs.test
   (:refer-clojure :exclude [println])
   (:require #_[clojure.template :as temp]
             [clojure.string :as str]
@@ -241,7 +241,7 @@
             [sci.impl.namespaces :as sci-namespaces]
             [sci.impl.resolve :as resolve]
             [sci.impl.vars :as vars])
-  (:require-macros [sci.configs.impl.clojure.test :refer [with-test-out-internal]]))
+  (:require-macros [sci.configs.cljs.test :refer [with-test-out-internal]]))
 
 ;; TODO: go through https://github.com/clojure/clojurescript/blob/r1.10.879-6-gaec9f0c5/src/main/cljs/cljs/test.cljc for compatibility
 ;; and https://github.com/clojure/clojurescript/blob/r1.10.879-6-gaec9f0c5/src/main/cljs/cljs/test.cljs
@@ -1084,3 +1084,54 @@
 (defmethod report-impl [:cljs.test/default :end-run-tests] [m]
   (when-not (successful? m)
     (set! (.-exitCode js/process) 1)))
+
+(defn new-var [var-sym f]
+  (sci/new-var var-sym f {:ns tns}))
+
+(def cljs-test-namespace
+  {:obj tns
+   'async (sci/copy-var async tns)
+   '-async-test (sci/copy-var -async-test tns)
+   '*load-tests* load-tests
+   '*stack-trace-depth* stack-trace-depth
+   '*report-counters* report-counters
+   '*initial-report-counters* initial-report-counters
+   '*testing-vars* testing-vars
+   '*testing-contexts* testing-contexts
+   'testing-vars-str (sci/copy-var testing-vars-str tns)
+   'testing-contexts-str (sci/copy-var testing-contexts-str tns)
+   'inc-report-counter! (sci/copy-var inc-report-counter! tns)
+   'report report
+   'do-report (sci/copy-var do-report tns)
+   ;; assertion utilities
+   'function? (sci/copy-var function? tns)
+   'assert-predicate (sci/copy-var assert-predicate tns)
+   'assert-any (sci/copy-var assert-any tns)
+   ;; assertion methods
+   'assert-expr (sci/copy-var assert-expr tns)
+   'try-expr (sci/copy-var try-expr tns)
+   ;; assertion macros
+   'is (sci/copy-var is tns)
+   'are (sci/copy-var are tns)
+   'testing (sci/copy-var testing tns)
+   ;; defining tests
+   'with-test (sci/copy-var with-test tns)
+   'deftest (sci/copy-var deftest tns)
+   'deftest- (sci/copy-var deftest- tns)
+   'set-test (sci/copy-var set-test tns)
+   ;; fixtures
+   'use-fixtures (sci/copy-var use-fixtures tns)
+   'compose-fixtures (sci/copy-var compose-fixtures tns)
+   'join-fixtures (sci/copy-var join-fixtures tns)
+   ;; running tests: low level
+   'test-var test-var
+   'test-vars (sci/copy-var test-vars tns)
+   'get-current-env (sci/copy-var get-current-env tns)
+   ;; TODO:
+   ;;'test-all-vars (new-var 'test-all-vars (contextualize test-all-vars))
+   ;; TODO:
+   ;;'test-ns (new-var 'test-ns (contextualize test-ns))
+   ;; running tests: high level
+   'run-tests (sci/copy-var run-tests tns)
+   ;; 'run-all-tests (sci/copy-var run-all-tests tns)
+   'successful? (sci/copy-var successful? tns)})

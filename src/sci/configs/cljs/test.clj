@@ -1,4 +1,4 @@
-(ns sci.configs.impl.clojure.test)
+(ns sci.configs.cljs.test)
 
 (defmacro with-test-out-internal
   "Runs body with *out* bound to the value of *test-out*."
