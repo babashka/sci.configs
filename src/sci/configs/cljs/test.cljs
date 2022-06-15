@@ -241,7 +241,10 @@
    [sci.impl.namespaces :as sci-namespaces]
    [sci.impl.resolve :as resolve]
    [sci.impl.utils :as utils :refer [needs-ctx]]
-   [sci.impl.vars :as vars]))
+   [sci.lang]))
+
+(defn sci-var? [x]
+  (instance? sci.lang.Var x))
 
 ;; TODO: go through https://github.com/clojure/clojurescript/blob/r1.10.879-6-gaec9f0c5/src/main/cljs/cljs/test.cljc for compatibility
 ;; and https://github.com/clojure/clojurescript/blob/r1.10.879-6-gaec9f0c5/src/main/cljs/cljs/test.cljs
@@ -476,7 +479,7 @@
   [ctx x]
   (if (symbol? x)
     (when-let [v (second (resolve/lookup ctx x false))]
-      (when-let [value (if (vars/var? v)
+      (when-let [value (if (sci-var? v)
                          (get-possibly-unbound-var v)
                          v)]
         (and (fn? value)
@@ -878,7 +881,7 @@
 
 (defn- test-var-block*
   [v t]
-  {:pre [(vars/var? v)]}
+  {:pre [(sci-var? v)]}
   [(fn []
      (update-current-env! [:testing-vars] conj v)
      (update-current-env! [:report-counters :test] inc)
@@ -1051,10 +1054,10 @@
   value due to the possiblity of asynchronous execution. To detect test
   completion add a :end-run-tests method case to the cljs.test/report
   multimethod."
-  ([ctx] (run-tests ctx (empty-env) (vars/getName @sci/ns)))
+  ([ctx] (run-tests ctx (empty-env) (symbol (str @sci/ns))))
   ([ctx env-or-ns]
    (if (map? env-or-ns)
-     (run-tests ctx env-or-ns (vars/getName @sci/ns))
+     (run-tests ctx env-or-ns (symbol (str @sci/ns)))
      (run-tests ctx (empty-env) env-or-ns)))
   ([ctx env-or-ns & namespaces]
    (run-block (apply run-tests-block ctx env-or-ns namespaces))))
