@@ -965,7 +965,7 @@
   appropriate fixtures assuming they are present in the current
   testing environment."
   [ctx vars]
-  (run-block (concat (ctx test-vars-block vars)
+  (run-block (concat (test-vars-block ctx vars)
                      [(fn []
                         (report {:type :end-test-vars :vars vars}))])))
 
@@ -1125,7 +1125,7 @@
    'join-fixtures (sci/copy-var join-fixtures tns)
    ;; running tests: low level
    'test-var test-var
-   'test-vars (sci/copy-var test-vars tns)
+   'test-vars (with-ctx (sci/copy-var test-vars tns))
    'get-current-env (sci/copy-var get-current-env tns)
    'run-tests (with-ctx (sci/copy-var run-tests tns))
    'successful? (sci/copy-var successful? tns)})

@@ -26,4 +26,28 @@
     (is (str/includes? @output "0 failures"))
     (is (str/includes? @output "0 errors"))))
 
+(deftest test-vars-test
+  (let [output (atom "")]
+    (sci/binding [sci/print-fn (fn [s]
+                                 (swap! output str s))]
+      (is (= [:each-before :each-after]
+             (sci/eval-string* ctx "
+(ns foo)
+(require '[cljs.test :as t :refer [deftest is testing]])
 
+(def state (atom []))
+
+(t/use-fixtures :each
+    {:before
+     (fn []
+       (swap! state conj :each-before))
+     :after
+     (fn []
+       (swap! state conj :each-after))})
+
+(deftest foo
+  (is (= 1 1)))
+
+(t/test-vars [#'foo])
+
+@state"))))))
