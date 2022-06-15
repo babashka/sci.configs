@@ -233,15 +233,14 @@
 "}
     sci.configs.cljs.test
   (:refer-clojure :exclude [println])
-  (:require #_[clojure.template :as temp]
-            [clojure.string :as str]
-            [sci.core :as sci]
-            [sci.impl.io :refer [println]]
-            [sci.impl.namespaces :as sci-namespaces]
-            [sci.impl.resolve :as resolve]
-            [sci.impl.vars :as vars]
-            [sci.impl.utils :as utils :refer [needs-ctx]])
-  (:require-macros [sci.configs.cljs.test :refer [with-test-out-internal]]))
+  (:require
+   [clojure.string :as str]
+   [sci.core :as sci]
+   [sci.impl.io :refer [println]]
+   [sci.impl.namespaces :as sci-namespaces]
+   [sci.impl.resolve :as resolve]
+   [sci.impl.utils :as utils :refer [needs-ctx]]
+   [sci.impl.vars :as vars]))
 
 ;; TODO: go through https://github.com/clojure/clojurescript/blob/r1.10.879-6-gaec9f0c5/src/main/cljs/cljs/test.cljc for compatibility
 ;; and https://github.com/clojure/clojurescript/blob/r1.10.879-6-gaec9f0c5/src/main/cljs/cljs/test.cljs
@@ -530,7 +529,6 @@
 
 (defmulti assert-expr
   (fn [ctx _menv _msg form]
-    (prn :fffffform form :msg _msg)
     (cond
       (nil? form) :always-fail
       (seq? form) (first form)
@@ -543,9 +541,8 @@
                            :file ~file :line ~line :end-line ~end-line :column ~column :end-column ~end-column})))
 
 (defmethod assert-expr :default [ctx _menv msg form]
-  (prn :ctx (keys ctx) :msg msg :form form)
   (if (and (sequential? form)
-           (function? ctx #_menv (first form)))
+           (function? ctx (first form)))
     (assert-predicate msg form)
     (assert-any msg form)))
 
@@ -678,7 +675,6 @@
   ([_ _ form]
    `(cljs.test/is ~form nil))
   ([_ _ form msg]
-   (prn :isform form :ismsg msg)
    `(cljs.test/try-expr ~msg ~form)))
 
 (defn ^:macro are
@@ -1133,11 +1129,5 @@
    'test-var test-var
    'test-vars (sci/copy-var test-vars tns)
    'get-current-env (sci/copy-var get-current-env tns)
-   ;; TODO:
-   ;;'test-all-vars (new-var 'test-all-vars (contextualize test-all-vars))
-   ;; TODO:
-   ;;'test-ns (new-var 'test-ns (contextualize test-ns))
-   ;; running tests: high level
    'run-tests (with-ctx (sci/copy-var run-tests tns))
-   ;; 'run-all-tests (sci/copy-var run-all-tests tns)
    'successful? (sci/copy-var successful? tns)})
