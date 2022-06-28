@@ -1062,6 +1062,21 @@
   ([ctx env-or-ns & namespaces]
    (run-block (apply run-tests-block ctx env-or-ns namespaces))))
 
+(defn ^:macro run-all-tests
+  "Runs all tests in all namespaces; prints results.
+  Optional argument is a regular expression; only namespaces with
+  names matching the regular expression (with re-matches) will be
+  tested."
+  ([_ _ _ctx] `(cljs.test/run-all-tests nil (cljs.test/empty-env)))
+  ([_ _ _ctx re] `(cljs.test/run-all-tests ~re (cljs.test/empty-env)))
+  ([_ _ ctx re env]
+   `(cljs.test/run-tests ~env
+               ~@(map
+                  (fn [ns]
+                    `(quote ~ns))
+                  (cond->> (sci/eval-form ctx '(all-ns))
+                    re (filter #(re-matches re (name %))))))))
+
 (defn ^:macro use-fixtures [_ _ type & fns]
   (condp = type
     :once
@@ -1131,6 +1146,8 @@
    'test-vars (with-ctx (sci/copy-var test-vars tns))
    'get-current-env (sci/copy-var get-current-env tns)
    'run-tests (with-ctx (sci/copy-var run-tests tns))
+   'run-all-tests (with-ctx (sci/copy-var run-all-tests tns))
+   'empty-env (sci/copy-var empty-env tns)
    'successful? (sci/copy-var successful? tns)})
 
 (def namespaces {'cljs.test cljs-test-namespace})

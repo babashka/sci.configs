@@ -1,0 +1,2 @@
+{:tasks
+ {cljs-repl (shell "clj -M:test -m cljs.main -re node")}}
