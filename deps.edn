@@ -1,5 +1,6 @@
 {:aliases {:test {:extra-paths ["test"]
-                  :extra-deps {org.babashka/sci {:mvn/version "0.3.32"}
+                  :extra-deps {org.babashka/sci {:git/url "https://github.com/babashka/sci"
+                                                 :git/sha "95d04fc356adf50a6e36cfa4f5a0540300f326f3"}
                                org.clojure/clojurescript {:mvn/version "1.11.51"}
                                applied-science/js-interop {:mvn/version "0.3.3"}
                                funcool/promesa {:mvn/version "8.0.450"}

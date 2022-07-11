@@ -240,7 +240,7 @@
    [sci.impl.io :refer [println]]
    [sci.impl.namespaces :as sci-namespaces]
    [sci.impl.resolve :as resolve]
-   [sci.impl.utils :as utils :refer [needs-ctx]]
+   [sci.impl.vars :as vars]
    [sci.lang]))
 
 (defn sci-var? [x]
@@ -1104,7 +1104,7 @@
 
 (defn- with-ctx [sci-var]
   (doto sci-var
-    (alter-meta! assoc :sci.impl/op needs-ctx)))
+    (vars/needs-ctx!)))
 
 (def cljs-test-namespace
   {:obj tns
@@ -1126,7 +1126,7 @@
    'assert-predicate (sci/copy-var assert-predicate tns)
    'assert-any (sci/copy-var assert-any tns)
    ;; assertion methods
-   'assert-expr (with-ctx (assert-expr tns))
+   'assert-expr (with-ctx (sci/copy-var assert-expr tns))
    'try-expr (with-ctx (sci/copy-var try-expr tns))
    ;; assertion macros
    'is (sci/copy-var is tns)
