@@ -237,10 +237,10 @@
   (:require
    [clojure.string :as str]
    [sci.core :as sci]
+   [sci.ctx-store :as store]
    [sci.impl.io :refer [println]]
    [sci.impl.namespaces :as sci-namespaces]
    [sci.impl.resolve :as resolve]
-   [sci.impl.vars :as vars]
    [sci.lang]))
 
 (defn sci-var? [x]
@@ -476,9 +476,9 @@
   "Returns true if argument is a function or a symbol that resolves to
   a function (not a macro)."
   {:added "1.1"}
-  [ctx x]
+  [x]
   (if (symbol? x)
-    (when-let [v (second (resolve/lookup ctx x false))]
+    (when-let [v (second (resolve/lookup (store/get-ctx) x false))]
       (when-let [value (if (sci-var? v)
                          (get-possibly-unbound-var v)
                          v)]
@@ -532,25 +532,25 @@
 ;; symbol in the test expression.
 
 (defmulti assert-expr
-  (fn [ctx _menv _msg form]
+  (fn [_menv _msg form]
     (cond
       (nil? form) :always-fail
       (seq? form) (first form)
       :else :default)))
 
-(defmethod assert-expr :always-fail [_ctx _menv msg form]
+(defmethod assert-expr :always-fail [_menv msg form]
   ;; nil test: always fail
   (let [{:keys [file line end-line column end-column]} (meta form)]
     `(cljs.test/report {:type :fail, :message ~msg
                            :file ~file :line ~line :end-line ~end-line :column ~column :end-column ~end-column})))
 
-(defmethod assert-expr :default [ctx _menv msg form]
+(defmethod assert-expr :default [_menv msg form]
   (if (and (sequential? form)
-           (function? ctx (first form)))
+           (function? (first form)))
     (assert-predicate msg form)
     (assert-any msg form)))
 
-(defmethod assert-expr 'instance? [_ctx _menv msg form]
+(defmethod assert-expr 'instance? [_menv msg form]
   ;; Test if x is an instance of y.
   (let [{:keys [file line end-line column end-column]} (meta form)]
     `(let [klass# ~(nth form 1)
@@ -567,7 +567,7 @@
              :expected '~form, :actual (type object#)}))
          result#))))
 
-(defmethod assert-expr 'thrown? [_ctx _menv msg form]
+(defmethod assert-expr 'thrown? [_menv msg form]
   ;; (is (thrown? c expr))
   ;; Asserts that evaluating expr throws an exception of class c.
   ;; Returns the exception thrown.
@@ -603,7 +603,7 @@
                                      :expected '~form, :actual e#})
             e#))))
 
-(defmethod assert-expr 'thrown-with-msg? [_ctx _menv msg form]
+(defmethod assert-expr 'thrown-with-msg? [_menv msg form]
   ;; (is (thrown-with-msg? c re expr))
   ;; Asserts that evaluating expr throws an exception of class c.
   ;; Also asserts that the message string of the exception matches
@@ -632,10 +632,10 @@
 (defn ^:macro try-expr
   "Used by the 'is' macro to catch unexpected exceptions.
   You don't call this."
-  [_ &env ctx msg form]
+  [_ &env msg form]
   (let [{:keys [file line end-line column end-column]} (meta form)]
     `(try
-       ~(assert-expr ctx &env msg form)
+       ~(assert-expr &env msg form)
        (catch :default t#
          (cljs.test/report
           {:type :error, :message ~msg,
@@ -925,12 +925,12 @@
 (defn test-vars-block
   "Like test-vars, but returns a block for further composition and
   later execution."
-  [ctx vars]
+  [vars]
   (map
    (fn [[ns vars]]
      (fn []
        (let [ns (symbol (str ns))
-             ni (sci-namespaces/sci-ns-interns ctx ns)
+             ni (sci-namespaces/sci-ns-interns (store/get-ctx) ns)
              _ (when-let [fs (get ni 'cljs-test-once-fixtures)]
                  (update-current-env! [:once-fixtures] assoc ns
                                       @fs))
@@ -967,15 +967,15 @@
   "Groups vars by their namespace and runs test-vars on them with
   appropriate fixtures assuming they are present in the current
   testing environment."
-  [ctx vars]
-  (run-block (concat (test-vars-block ctx vars)
+  [vars]
+  (run-block (concat (test-vars-block vars)
                      [(fn []
                         (report {:type :end-test-vars :vars vars}))])))
 
 (defn test-all-vars-block
-  ([ctx ns]
+  ([ns]
    (let [env (get-current-env)
-         ni (sci-namespaces/sci-ns-interns ctx ns)]
+         ni (sci-namespaces/sci-ns-interns (store/get-ctx) ns)]
      (concat
       [(fn []
          (when (nil? env)
@@ -987,8 +987,7 @@
            (update-current-env! [:each-fixtures] assoc ns
                                 @fs)))]
       (test-vars-block
-       ctx
-       (let [vars (vals (sci-namespaces/sci-ns-interns ctx ns))
+       (let [vars (vals (sci-namespaces/sci-ns-interns (store/get-ctx) ns))
              tests (filter (fn [var] (:test (meta var))) vars)
              sorted (sort-by (fn [var] (:line (meta var))) tests)]
          sorted))
@@ -999,7 +998,7 @@
 (defn test-ns-block
   "Like test-ns, but returns a block for further composition and
   later execution.  Does not clear the current env."
-  ([ctx env form]
+  ([env form]
    #_(assert (and (= quote 'quote) (symbol? ns)) "Argument to test-ns must be a quoted symbol")
    #_(assert (ana-api/find-ns ns) (str "Namespace " ns " does not exist"))
    [(fn []
@@ -1009,7 +1008,7 @@
       (if-let [v  false #_(ana-api/ns-resolve ns 'test-ns-hook)]
         nil #_`(~(symbol (name ns) "test-ns-hook"))
         ;; Otherwise, just test every var in the namespace.
-        (block (test-all-vars-block ctx form))))
+        (block (test-all-vars-block form))))
     (fn []
       (do-report {:type :end-test-ns, :ns form}))]))
 
@@ -1018,7 +1017,7 @@
 (defn run-tests-block
   "Like test-vars, but returns a block for further composition and
   later execution."
-  [ctx env-or-ns & namespaces]
+  [env-or-ns & namespaces]
   #_(assert (every?
              (fn [[quote ns]] (and (= quote 'quote) (symbol? ns)))
              namespaces)
@@ -1032,7 +1031,7 @@
                   :type :summary})]
     (concat (mapcat
              (fn [ns]
-               (concat (test-ns-block ctx env ns)
+               (concat (test-ns-block env ns)
                        [(fn []
                           (cljs.core/vswap!
                            summary
@@ -1054,27 +1053,27 @@
   value due to the possiblity of asynchronous execution. To detect test
   completion add a :end-run-tests method case to the cljs.test/report
   multimethod."
-  ([ctx] (run-tests ctx (empty-env) (symbol (str @sci/ns))))
-  ([ctx env-or-ns]
+  ([] (run-tests (empty-env) (symbol (str @sci/ns))))
+  ([env-or-ns]
    (if (map? env-or-ns)
-     (run-tests ctx env-or-ns (symbol (str @sci/ns)))
-     (run-tests ctx (empty-env) env-or-ns)))
-  ([ctx env-or-ns & namespaces]
-   (run-block (apply run-tests-block ctx env-or-ns namespaces))))
+     (run-tests env-or-ns (symbol (str @sci/ns)))
+     (run-tests (empty-env) env-or-ns)))
+  ([env-or-ns & namespaces]
+   (run-block (apply run-tests-block env-or-ns namespaces))))
 
 (defn ^:macro run-all-tests
   "Runs all tests in all namespaces; prints results.
   Optional argument is a regular expression; only namespaces with
   names matching the regular expression (with re-matches) will be
   tested."
-  ([_ _ _ctx] `(cljs.test/run-all-tests nil (cljs.test/empty-env)))
-  ([_ _ _ctx re] `(cljs.test/run-all-tests ~re (cljs.test/empty-env)))
-  ([_ _ ctx re env]
+  ([_ _ ] `(cljs.test/run-all-tests nil (cljs.test/empty-env)))
+  ([_ _ re] `(cljs.test/run-all-tests ~re (cljs.test/empty-env)))
+  ([_ _ re env]
    `(cljs.test/run-tests ~env
                ~@(map
                   (fn [ns]
                     `(quote ~ns))
-                  (cond->> (sci/eval-form ctx '(all-ns))
+                  (cond->> (sci/eval-form (store/get-ctx) '(all-ns))
                     re (filter #(re-matches re (name %))))))))
 
 (defn ^:macro use-fixtures [_ _ type & fns]
@@ -1102,9 +1101,8 @@
   (when-not (successful? m)
     (set! (.-exitCode js/process) 1)))
 
-(defn- with-ctx [sci-var]
-  (doto sci-var
-    (vars/needs-ctx!)))
+
+(def assert-expr-var (sci/copy-var assert-expr tns))
 
 (def cljs-test-namespace
   {:obj tns
@@ -1122,12 +1120,12 @@
    'report report
    'do-report (sci/copy-var do-report tns)
    ;; assertion utilities
-   'function? (with-ctx (sci/copy-var function? tns))
+   'function? (sci/copy-var function? tns)
    'assert-predicate (sci/copy-var assert-predicate tns)
    'assert-any (sci/copy-var assert-any tns)
    ;; assertion methods
-   'assert-expr (with-ctx (sci/copy-var assert-expr tns))
-   'try-expr (with-ctx (sci/copy-var try-expr tns))
+   'assert-expr assert-expr-var
+   'try-expr (sci/copy-var try-expr tns)
    ;; assertion macros
    'is (sci/copy-var is tns)
    'are (sci/copy-var are tns)
@@ -1143,10 +1141,10 @@
    'join-fixtures (sci/copy-var join-fixtures tns)
    ;; running tests: low level
    'test-var test-var
-   'test-vars (with-ctx (sci/copy-var test-vars tns))
+   'test-vars (sci/copy-var test-vars tns)
    'get-current-env (sci/copy-var get-current-env tns)
-   'run-tests (with-ctx (sci/copy-var run-tests tns))
-   'run-all-tests (with-ctx (sci/copy-var run-all-tests tns))
+   'run-tests (sci/copy-var run-tests tns)
+   'run-all-tests (sci/copy-var run-all-tests tns)
    'empty-env (sci/copy-var empty-env tns)
    'successful? (sci/copy-var successful? tns)})
 
