@@ -1,6 +1,5 @@
 (ns sci.configs.cljs.pprint
   (:require [cljs.pprint :as pp]
-            [nbb.core :as nbb]
             [sci.core :as sci]))
 
 (def pns (sci/create-ns 'cljs.pprint nil))
@@ -13,11 +12,10 @@
   (binding [*print-fn* @sci/print-fn]
     (apply pp/print-table args)))
 
-(def pprint-namespace
+(def cljs-pprint-namespace
   {'pprint (sci/copy-var pprint pns)
    'print-table (sci/copy-var print-table pns)})
 
-(defn init []
-  (nbb/register-plugin!
-   ::pprint
-   {:namespaces {'cljs.pprint pprint-namespace}}))
+(def namespaces {'cljs.pprint cljs-pprint-namespace})
+
+(def config {:namespaces namespaces})

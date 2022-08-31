@@ -104,6 +104,16 @@ Public API:
 - `cljs-test-namespace`
 ```
 
+### [cljs.pprint](https://cljs.github.io/api/cljs.pprint/)
+
+Public API:
+
+``` clojure
+- `config`
+- `namespaces`
+- `cljs-pprint-namespace`
+```
+
 ## License
 
 The configurations are licensed under the same licenses as the libraries they
