@@ -3,7 +3,8 @@
 
                             await map mapcat run!
                             future let loop recur -> ->>
-                            with-redefs])
+                            with-redefs
+                            doseq])
   (:require [clojure.core :as c]
             [promesa.core :as p]
             [promesa.exec :as exec]
@@ -143,6 +144,14 @@
   [_ _ & args]
   `(array-map :type :promesa.core/recur :args [~@args]))
 
+(defn ^:macro doseq
+  "Simplified version of `doseq` which takes one binding and a seq, and
+  runs over it using `promesa.core/run!`"
+  [_ _ [binding xs] & body]
+  `(run! (fn [~binding]
+           (promesa.core/do ~@body))
+         ~xs))
+
 (def promesa-namespace
   {'*loop-run-fn* loop-run-fn
    '->            (sci/copy-var -> pns)
@@ -179,7 +188,8 @@
    'then          (sci/copy-var p/then pns)
    'thenable?     (sci/copy-var p/thenable? pns)
    'with-redefs   (sci/copy-var with-redefs pns)
-   'wrap          (sci/copy-var p/wrap pns)})
+   'wrap          (sci/copy-var p/wrap pns)
+   'doseq         (sci/copy-var doseq pns)})
 
 (def promesa-protocols-namespace
   {'-bind (sci/copy-var pt/-bind ptns)
