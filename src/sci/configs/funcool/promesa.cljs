@@ -148,9 +148,10 @@
   "Simplified version of `doseq` which takes one binding and a seq, and
   runs over it using `promesa.core/run!`"
   [_ _ [binding xs] & body]
-  `(run! (fn [~binding]
-           (promesa.core/do ~@body))
-         ~xs))
+  `(promesa.core/run!
+    (fn [~binding]
+      (promesa.core/do ~@body))
+    ~xs))
 
 (def promesa-namespace
   {'*loop-run-fn* loop-run-fn
