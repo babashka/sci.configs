@@ -1,9 +1,12 @@
 {:aliases {:test {:extra-paths ["test"]
                   :extra-deps {org.babashka/sci {:git/url "https://github.com/babashka/sci"
-                                                 :git/sha "95d04fc356adf50a6e36cfa4f5a0540300f326f3"}
+                                                 :git/sha "ee6377460bb0e29466a4271f192c8540c9a4ace9"}
                                org.clojure/clojurescript {:mvn/version "1.11.51"}
                                applied-science/js-interop {:mvn/version "0.3.3"}
-                               funcool/promesa {:mvn/version "8.0.450"}
-                               reagent/reagent {:mvn/version "1.1.0"}}
-                  }}
+                               funcool/promesa {:mvn/version "9.0.494"}
+                               reagent/reagent {:mvn/version "1.1.0"}}}
+           :cljs-test-runner
+           {:extra-deps {olical/cljs-test-runner {:mvn/version "3.8.0"}}
+            :extra-paths ["test" "cljs-test-runner-out/gen"]
+            :main-opts ["-m" "cljs-test-runner.main" "-d" "test"]}}
  :deps {}}

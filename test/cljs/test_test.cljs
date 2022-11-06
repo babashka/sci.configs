@@ -3,20 +3,26 @@
    [cljs.test :refer [deftest is]]
    [clojure.string :as str]
    [sci.configs.cljs.test :as t]
-   [sci.core :as sci]))
+   [sci.core :as sci]
+   [sci.ctx-store :as store]))
 
-(defn ctx [] (sci/init {:namespaces {'cljs.test t/cljs-test-namespace}}))
+(defn ctx-fn [] (sci/init {:namespaces {'cljs.test t/cljs-test-namespace}}))
+
 
 (deftest function?-test
-  (is (true? (sci/eval-string* (ctx) "
+  (let [ctx (ctx-fn)]
+    (store/reset-ctx! ctx)
+    (is (true? (sci/eval-string* ctx "
 (require '[cljs.test :as t])
-(t/function? 'inc)"))))
+(t/function? 'inc)")))))
 
 (deftest deftest-test
-  (let [output (atom "")]
+  (let [output (atom "")
+        ctx (ctx-fn)]
+    (store/reset-ctx! ctx)
     (sci/binding [sci/print-fn (fn [s]
                                  (swap! output str s))]
-      (sci/eval-string* (ctx) "
+      (sci/eval-string* ctx "
 (ns foo)
 (require '[cljs.test :as t :refer [deftest is testing]])
 (deftest foo
@@ -27,11 +33,13 @@
     (is (str/includes? @output "0 errors"))))
 
 (deftest test-vars-test
-  (let [output (atom "")]
+  (let [output (atom "")
+        ctx (ctx-fn)]
+    (store/reset-ctx! ctx)
     (sci/binding [sci/print-fn (fn [s]
                                  (swap! output str s))]
       (is (= [:each-before :each-after]
-             (sci/eval-string* (ctx) "
+             (sci/eval-string* ctx "
 (ns foo)
 (require '[cljs.test :as t :refer [deftest is testing]])
 
@@ -53,10 +61,12 @@
 @state"))))))
 
 (deftest run-all-tests-test
-  (let [output (atom "")]
+  (let [output (atom "")
+        ctx (ctx-fn)]
+    (store/reset-ctx! ctx)
     (sci/binding [sci/print-fn (fn [s]
                                  (swap! output str s))]
-      (sci/eval-string* (ctx) "
+      (sci/eval-string* ctx "
 (ns foo)
 (require '[cljs.test :as t :refer [deftest is testing]])
 (deftest foo

@@ -3,3 +3,4 @@
 .lsp
 .DS_Store
 .cpcache
+cljs-test-runner-out
