@@ -87,6 +87,8 @@
                        rns)
    'make-reaction (sci/copy-var reagent.ratom/make-reaction
                                 rns)
+   'make-track (sci/copy-var reagent.ratom/make-track
+                             rns)
    'track! (sci/copy-var reagent.ratom/track! rns)})
 
 (def rdbgns (sci/create-ns 'reagent.debug nil))
