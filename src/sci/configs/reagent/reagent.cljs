@@ -65,10 +65,12 @@
   {'atom (sci/copy-var r/atom rns)
    'as-element (sci/copy-var r/as-element rns)
    'with-let (sci/copy-var with-let rns)
+   'class-names (sci/copy-var r/class-names rns)
    'cursor (sci/copy-var r/cursor rns)
    'create-class (sci/copy-var r/create-class rns)
    'create-compiler (sci/copy-var r/create-compiler rns)
-   'reactify-component (sci/copy-var r/reactify-component rns)})
+   'reactify-component (sci/copy-var r/reactify-component rns)
+   'track              (sci/copy-var r/track rns)})
 
 (def rtmns (sci/create-ns 'reagent.ratom nil))
 
