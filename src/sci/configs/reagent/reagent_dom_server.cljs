@@ -8,4 +8,6 @@
   {'render-to-string (sci/copy-var srv/render-to-string rdns)
    'render-to-static-markup (sci/copy-var srv/render-to-static-markup rdns)})
 
-(def config {:namespaces {'reagent.dom.server reagent-dom-server-namespace} })
+(def namespaces {'reagent.dom.server reagent-dom-server-namespace})
+
+(def config {:namespaces namespaces})
