@@ -82,6 +82,50 @@ Public API:
 - `config`
 - `reagent-dom-server-namespace`
 
+### [re-frame/re-frame](https://github.com/day8/re-frame)
+
+Namespace: `sci.configs.re-frame.re-frame`
+
+Public API:
+
+- `dispatch`
+- `dispatch-sync`
+- `reg-event-db`
+- `reg-event-fx`
+- `reg-event-ctx`
+- `clear-event`
+- `reg-sub`
+- `subscribe`
+- `clear-sub`
+- `reg-sub-raw`
+- `clear-subscription-cache`
+- `reg-fx`
+- `clear-fx`
+- `reg-cofx`
+- `inject-cofx`
+- `clear-cofx`
+- `debug`
+- `path`
+- `enrich`
+- `unwrap`
+- `trim-v`
+- `after`
+- `on-changes`
+- `reg-global-interceptor`
+- `clear-global-interceptor`
+- `->interceptor`
+- `get-coeffect`
+- `assoc-coeffect`
+- `get-effect`
+- `assoc-effect`
+- `enqueue`
+- `set-loggers`
+- `console`
+- `make-restore-fn`
+- `purge-event-queue`
+- `add-post-event-callback`
+- `remove-post-event-callback`
+
 ### [mfikes/cljs-bean](https://github.com/mfikes/cljs-bean)
 
 Namespace: `sci.configs.mfikes.cljs-bean`
