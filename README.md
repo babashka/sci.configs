@@ -142,21 +142,17 @@ Namespace `sci.configs.cljs.test`
 
 Public API:
 
-``` clojure
 - `config`
 - `namespaces`
 - `cljs-test-namespace`
-```
 
 ### [cljs.pprint](https://cljs.github.io/api/cljs.pprint/)
 
 Public API:
 
-``` clojure
 - `config`
 - `namespaces`
 - `cljs-pprint-namespace`
-```
 
 ## License
 
