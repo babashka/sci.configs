@@ -1,6 +1,5 @@
 (ns sci.configs.funcool.promesa
   (:refer-clojure :exclude [delay spread promise
-
                             await map mapcat run!
                             future let loop recur -> ->>
                             with-redefs
@@ -168,6 +167,7 @@
    'do!           (sci/copy-var do! pns)
    'error         (sci/copy-var p/error pns)
    'finally       (sci/copy-var p/finally pns)
+   'future        (sci/copy-var p/future pns)
    'handle        (sci/copy-var p/handle pns)
    'let           (sci/copy-var let pns)
    'loop          (sci/copy-var loop pns)
