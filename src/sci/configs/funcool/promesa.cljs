@@ -1,6 +1,5 @@
 (ns sci.configs.funcool.promesa
   (:refer-clojure :exclude [delay spread promise
-
                             await map mapcat run!
                             future let loop recur -> ->>
                             with-redefs
@@ -148,10 +147,17 @@
   "Simplified version of `doseq` which takes one binding and a seq, and
   runs over it using `promesa.core/run!`"
   [_ _ [binding xs] & body]
-  `(promesa.core/run!
+  `(p/run!
     (fn [~binding]
-      (promesa.core/do ~@body))
+      (p/do ~@body))
     ~xs))
+
+(defn ^:macro future
+  "Analogous macro to `clojure.core/future` that returns promise
+  instance instead of the `Future`. Exposed just for convenience and
+  works as an alias to `thread`."
+  [_ _ & body]
+  `(p/thread-call :default (^:once fn [] ~@body)))
 
 (def promesa-namespace
   {'*loop-run-fn* loop-run-fn
@@ -168,6 +174,8 @@
    'do!           (sci/copy-var do! pns)
    'error         (sci/copy-var p/error pns)
    'finally       (sci/copy-var p/finally pns)
+   'future        (sci/copy-var future pns)
+   'thread-call   (sci/copy-var p/thread-call pns)
    'handle        (sci/copy-var p/handle pns)
    'let           (sci/copy-var let pns)
    'loop          (sci/copy-var loop pns)
