@@ -1,37 +1,20 @@
 (ns funcool.promesa-test
-  (:require #?(:cljs [cljs.test :as t]
-               :clj [clojure.test :as t])
-            [promesa.tests.util :refer [promise-ok promise-ko normalize-to-value]]
-            [promesa.core :as p :include-macros true]
-            [promesa.exec :as e]))
+  (:require
+   [cljs.test :refer [deftest is async]]
+   [sci.configs.funcool.promesa :as promesa-config]
+   [sci.core :as sci]))
 
-(t/deftest future-macro
-  (let [p1 (p/future (+ 1 2 3))
-        test #(p/then p1 (fn [res] (t/is (= res 6))))]
-    #?(:cljs (t/async done (p/do (test) (done)))
-       :clj @(test))))
+(defn ctx-fn [] (sci/init {:namespaces promesa-config/namespaces}))
 
-(t/deftest loop-and-recur
-  (let [p1 (p/loop [a (p/delay 50 0)]
-             (if (= a 5)
-               a
-               (p/recur (p/delay 50 (inc a)))))
-        test #(->> (p/race [p1 (p/delay 400 10)])
-                   (p/map (fn [res] (t/is (= res 5)))))]
-    #?(:cljs (t/async done (p/do (test) (done)))
-       :clj @(test))))
+(deftest future-test
+  (let [ctx (ctx-fn)
+        p (sci/eval-string* ctx "
+(ns example
+  (:require
+    [promesa.core :as p]))
 
-;; --- Threading tests
-
-(defn future-inc [x]
-  (p/future (inc x)))
-
-(t/deftest doseq-test
-  (let [test #(p/let [state (atom [])
-                      xs [10 20 30]]
-                (p/doseq [x xs]
-                  (p/delay (- 100 x))
-                  (swap! state conj x))
-                (t/is (= xs @state)))]
-    #?(:cljs (t/async done (p/do (test) (done)))
-       :clj @(test))))
+(p/future (inc 2))")]
+    (async done
+           (-> (.then p (fn [v] (is (= 3 v))))
+               (.catch (fn [_] (is false)))
+               (.finally (done))))))
