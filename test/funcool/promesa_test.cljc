@@ -18,3 +18,7 @@
            (-> (.then p (fn [v] (is (= 3 v))))
                (.catch (fn [_] (is false)))
                (.finally (done))))))
+
+(deftest promise-done?
+  (let [p1 (p/promise 1)]
+    (is (p/done? p1))))
