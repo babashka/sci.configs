@@ -12,9 +12,14 @@
   (binding [*print-fn* @sci/print-fn]
     (apply pp/print-table args)))
 
+(defn cl-format [& args]
+  (binding [*print-fn* @sci/print-fn]
+    (apply pp/cl-format args)))
+
 (def cljs-pprint-namespace
   {'pprint (sci/copy-var pprint pns)
-   'print-table (sci/copy-var print-table pns)})
+   'print-table (sci/copy-var print-table pns)
+   'cl-format (sci/copy-var cl-format pns)})
 
 (def namespaces {'cljs.pprint cljs-pprint-namespace})
 
