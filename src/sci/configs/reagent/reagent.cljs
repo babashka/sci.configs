@@ -35,7 +35,7 @@
                                        (aget ~v ~j)))))
                               bindings))
         [forms destroy] (let [fin (last body)]
-                          (if (and (list? fin)
+                          (if (and (seq? fin)
                                    (= 'finally (first fin)))
                             [(butlast body) `(fn [] ~@(rest fin))]
                             [body nil]))
