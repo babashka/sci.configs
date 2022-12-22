@@ -73,16 +73,6 @@ Public API:
 - `reagent-debug-namespace`
 - `namespaces`
 
-You will need to add the following list of externs. If you are using shadow-cljs, you can add the following to `$project/externs/<build>.txt`:
-
-``` clojure
-# with-let macro in SCI
-generation
-ratomGeneration
-destroy
-# end with-let
-```
-
 The configuration for `reagent.dom.server` is available seperately via:
 
 Namespace: `sci.configs.reagent.reagent-dom-server`

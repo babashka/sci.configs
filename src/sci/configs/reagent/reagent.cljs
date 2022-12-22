@@ -43,18 +43,18 @@
                       (list
                        `(let [destroy# ~destroy]
                           (if (reagent.ratom/reactive?)
-                            (when (nil? (.-destroy ~v))
-                              (set! (.-destroy ~v) destroy#))
+                            (when (nil? (reagent.ratom/-destroy ~v))
+                              (reagent.ratom/-destroy! ~v destroy#))
                             (destroy#)))))
         asserting (dev?) #_(if *assert* true false)
         res (gensym "res")]
     `(let [~v (reagent.ratom/with-let-values ~k)]
        ~(when asserting
           `(when-some [c# (reagent.ratom/-ratom-context)]
-             (when (== (.-generation ~v) (.-ratomGeneration c#))
+             (when (== (reagent.ratom/-generation ~v) (reagent.ratom/-ratom-generation c#))
                (d/error "Warning: The same with-let is being used more "
                         "than once in the same reactive context."))
-             (set! (.-generation ~v) (.-ratomGeneration c#))))
+             (reagent.ratom/-set-ratom-generation! ~v c#)))
        (let ~(into bs [res `(do ~@forms)])
          ~@add-destroy
          ~res))))
@@ -79,10 +79,35 @@
   []
   ratom/*ratom-context*)
 
+(defn -generation
+  [x]
+  (.-generation x))
+
+(defn -ratom-generation
+  [x]
+  (.-ratomGeneration x))
+
+(defn -set-ratom-generation!
+  [v c]
+  (set! (.-generation v) (.-ratomGeneration c)))
+
+(defn -destroy!
+  [v destroy]
+  (set! (.-destroy v) destroy))
+
+(defn -destroy
+  [v]
+  (.-destroy v))
+
 (def reagent-ratom-namespace
   {'with-let-values (sci/copy-var ratom/with-let-values rtmns)
    'reactive? (sci/copy-var ratom/reactive? rtmns)
    '-ratom-context (sci/copy-var -ratom-context rtmns)
+   '-generation (sci/copy-var -generation rtmns)
+   '-ratom-generation (sci/copy-var -ratom-generation rtmns)
+   '-set-ratom-generation! (sci/copy-var -set-ratom-generation! rtmns)
+   '-destroy! (sci/copy-var -destroy! rtmns)
+   '-destroy (sci/copy-var -destroy rtmns)
    'atom (sci/copy-var reagent.ratom/atom
                        rns)
    'make-reaction (sci/copy-var reagent.ratom/make-reaction
