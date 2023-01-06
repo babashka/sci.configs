@@ -70,7 +70,9 @@
    'create-class (sci/copy-var r/create-class rns)
    'create-compiler (sci/copy-var r/create-compiler rns)
    'reactify-component (sci/copy-var r/reactify-component rns)
-   'track              (sci/copy-var r/track rns)})
+   'track (sci/copy-var r/track rns)
+   'track! (sci/copy-var r/track! rns)
+   'dispose! (sci/copy-var r/dispose! rns)})
 
 (def rtmns (sci/create-ns 'reagent.ratom nil))
 

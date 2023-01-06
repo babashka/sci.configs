@@ -120,6 +120,10 @@ Public API:
 - `namespaces`
 - `cljs-pprint-namespace`
 
+## Contributing
+
+`npm install` and `bb test`
+
 ## License
 
 The configurations are licensed under the same licenses as the libraries they
