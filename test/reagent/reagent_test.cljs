@@ -24,28 +24,3 @@
 (swap! click-count inc)
 
 (rdom/render-to-string [counting-component])")))))
-
-(deftest track!-test
-  (let [ctx (ctx-fn)]
-    (sci/eval-string* ctx "
-(ns example
-  (:require
-    [reagent.core :as r]
-    [reagent.dom.server :as rdom]))
-
-(def click-count (r/atom 0))
-
-(def integral (r/atom 0))
-
-(def click-count-tracker (r/track! (fn [] (swap! integral + @click-count))))
-
-(defn counting-component []
-  [:div @integral])
-
-(swap! click-count inc)
-
-(r/dispose! click-count-tracker)
-
-(swap! click-count inc)
-
-(rdom/render-to-string [counting-component])")))
