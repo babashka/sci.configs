@@ -120,6 +120,15 @@ Public API:
 - `namespaces`
 - `cljs-pprint-namespace`
 
+### [tonsky/datascript](https://github.com/tonsky/datascript)
+
+Public API:
+
+- `config`
+- `namespaces`
+- `core-namespace`
+- `db-namespace`
+
 ## Contributing
 
 `npm install` and `bb test`
