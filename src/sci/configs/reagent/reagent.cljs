@@ -63,6 +63,7 @@
 
 (def reagent-namespace
   {'atom (sci/copy-var r/atom rns)
+   'create-element (sci/copy-var r/create-element rns)
    'as-element (sci/copy-var r/as-element rns)
    'with-let (sci/copy-var with-let rns)
    'class-names (sci/copy-var r/class-names rns)
