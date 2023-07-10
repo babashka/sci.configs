@@ -1,10 +1,10 @@
-(ns clojure.core-test
+(ns clojure.clojure-1-11-test
   (:require
    [clojure.test :refer [deftest is]]
-   [sci.configs.clojure.core :as core-namespace]
+   [sci.configs.clojure-1-11 :as core-namespace]
    [sci.core :as sci]))
 
-(defn ctx-fn [] (sci/init {:namespaces core-namespace/version-1-11}))
+(defn ctx-fn [] (sci/init {:namespaces core-namespace/namespaces}))
 
 (deftest parse-functions-test
   (let [ctx (ctx-fn)]

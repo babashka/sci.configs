@@ -129,13 +129,13 @@ Public API:
 - `core-namespace`
 - `db-namespace`
 
-### [clojure.core](https://github.com/clojure/clojure/blob/master/src/clj/clojure/core.clj)
+### [clojure-1-11](https://github.com/clojure/clojure/blob/master/src/clj/clojure/core.clj)
 
 Namespace: `clojure.core`
 
-New functions added to clojure.core in various versions
+New functions added to clojure.core in version 1.11
 
-- `version-1-11` (functions added to Clojure core in v1.11)
+- `namespaces`
 
 ## Contributing
 

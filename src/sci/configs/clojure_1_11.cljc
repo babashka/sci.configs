@@ -1,4 +1,4 @@
-(ns sci.configs.clojure.core
+(ns sci.configs.clojure-1-11
   (:require [sci.core :as sci]
             [sci.impl.utils :refer [clojure-core-ns]]
             [clojure.core :as c]))
@@ -17,5 +17,5 @@
    'iteration (sci/copy-var c/iteration clojure-core-ns)})
 
 
-(def version-1-11
+(def namespaces
   {'clojure.core clojure-core-namespace-extras-1-11})
