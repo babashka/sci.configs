@@ -192,7 +192,7 @@
    'run!          (sci/copy-var p/run! pns)
    'then          (sci/copy-var p/then pns)
    'thenable?     (sci/copy-var p/thenable? pns)
-   'timeout       (sci/copy-var p/timeout)
+   'timeout       (sci/copy-var p/timeout pns)
    'with-redefs   (sci/copy-var with-redefs pns)
    'wrap          (sci/copy-var p/wrap pns)
    'doseq         (sci/copy-var doseq pns)})
