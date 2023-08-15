@@ -1074,7 +1074,7 @@
                   (fn [ns]
                     `(quote ~ns))
                   (cond->> (sci/eval-form (store/get-ctx) '(all-ns))
-                    re (filter #(re-matches re (name %))))))))
+                    re (filter #(re-matches re (name (ns-name %)))))))))
 
 (defn ^:macro use-fixtures [_ _ type & fns]
   (condp = type
