@@ -16,11 +16,12 @@
 
 (p/do
 1 2 3
-(p/let [x (p/resolved (inc 2))]
-  (inc x)))")]
+(p/let [x (p/resolved (inc 2))
+        y (inc x)]
+  (inc y)))")]
     (async done
            (-> p
                (.then (fn [v]
-                        (is (= 4 v))))
+                        (is (= 5 v))))
                (.catch (fn [_] (is false)))
                (p/finally done)))))

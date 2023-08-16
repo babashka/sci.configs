@@ -7,8 +7,6 @@
   (:require [clojure.core :as c]
             [promesa.core :as p]
             [promesa.exec :as exec]
-            [promesa.impl :as impl]
-            [promesa.protocols :as pt]
             [sci.core :as sci]))
 
 (def pns (sci/create-ns 'promesa.core nil))
@@ -20,11 +18,11 @@
   expression."
   [_ _ & exprs]
   (condp = (count exprs)
-    0 `(impl/resolved nil)
-    1 `(pt/-promise ~(first exprs))
+    0 `(p/resolved nil)
+    1 `(p/promise ~(first exprs))
     (reduce (fn [acc e]
-              `(pt/-mcat (pt/-promise ~e) (fn [_#] ~acc)))
-            `(pt/-promise ~(last exprs))
+              `(p/bind (p/promise ~e) (fn [_#] ~acc)))
+            `(p/promise ~(last exprs))
             (reverse (butlast exprs)))))
 
 (defn ^:macro let*
@@ -34,7 +32,7 @@
   (assert (even? (count bindings)) (str "Uneven binding vector: " bindings))
   (c/->> (reverse (partition 2 bindings))
          (reduce (fn [acc [l r]]
-                   `(pt/-mcat (pt/-promise ~r) (fn [~l] ~acc)))
+                   `(p/bind (p/promise ~r) (fn [~l] ~acc)))
                  `(promesa.core/do ~@body))))
 
 (defn ^:macro let
@@ -42,8 +40,8 @@
   promises on the bindings."
   [_ _ bindings & body]
   (if (seq bindings)
-    `(pt/-mcat
-      (pt/-promise nil)
+    `(p/bind
+      (p/promise nil)
       (fn [_#] (promesa.core/let* ~bindings ~@body)))
     `(promesa.core/do ~@body)))
 
@@ -171,6 +169,7 @@
    '->> (sci/copy-var ->> pns)
    'all (sci/copy-var p/all pns)
    'any (sci/copy-var p/any pns)
+   'bind (sci/copy-var p/bind pns)
    'catch (sci/copy-var p/catch pns)
    'chain (sci/copy-var p/chain pns)
    'create (sci/copy-var p/create pns)
@@ -207,17 +206,6 @@
 
 (def pims (sci/create-ns 'promesa.impl nil))
 
-(def promesa-protocols-namespace
-  {'-mcat (sci/copy-var pt/-mcat ptns)
-   '-promise (sci/copy-var pt/-promise ptns)})
-
-(def promesa-impl-namespace
-  {'resolved (sci/copy-var impl/resolved ptns)})
-
-(def namespaces {'promesa.core promesa-namespace
-                 ;; exposed for macros that expand to it
-                 'promesa.protocols promesa-protocols-namespace
-                 ;; exposed for macros that expand to it
-                 'promesa.impl promesa-impl-namespace})
+(def namespaces {'promesa.core promesa-namespace})
 
 (def config {:namespaces namespaces})
