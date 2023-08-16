@@ -78,6 +78,7 @@
   (is (= 1 1)))
 
 (t/run-all-tests)"))
+    (is (str/includes? @output "Testing cljs.test"))
     (is (str/includes? @output "2 tests"))
     (is (str/includes? @output "2 assertions"))
     (is (str/includes? @output "0 failures"))

@@ -10,5 +10,7 @@
            :cljs-test-runner
            {:extra-deps {olical/cljs-test-runner {:mvn/version "3.8.0"}}
             :extra-paths ["test" "cljs-test-runner-out/gen"]
-            :main-opts ["-m" "cljs-test-runner.main" "-d" "test"]}}
+            :main-opts ["-m" "cljs-test-runner.main" "-d" "test"]}
+           :cljs-test-runner-advanced
+           {:main-opts ["-m" "cljs-test-runner.main" "-d" "test" "-c" "{:optimizations :advanced}"]}}
  :deps {}}

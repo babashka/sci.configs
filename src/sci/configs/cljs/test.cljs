@@ -388,7 +388,7 @@
   (println (:fail m) "failures," (:error m) "errors."))
 
 (defmethod report-impl [:cljs.test/default :begin-test-ns] [m]
-  (println "\nTesting" (:ns m)))
+  (println "\nTesting" (ns-name (:ns m))))
 
 ;; Ignore these message types:
 (defmethod report-impl [:cljs.test/default :end-test-ns] [m])

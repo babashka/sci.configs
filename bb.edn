@@ -1,3 +1,4 @@
 {:tasks
  {cljs-repl (shell "clj -M:test -m cljs.main -re node")
-  test (clojure "-M:test:cljs-test-runner")}}
+  test (clojure "-M:test:cljs-test-runner")
+  test:advanced (clojure "-M:test:cljs-test-runner:cljs-test-runner-advanced")}}
