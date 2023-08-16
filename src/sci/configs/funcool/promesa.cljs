@@ -35,7 +35,7 @@
   (c/->> (reverse (partition 2 bindings))
          (reduce (fn [acc [l r]]
                    `(pt/-mcat (pt/-promise ~r) (fn [~l] ~acc)))
-                 `(do* ~@body))))
+                 `(promesa.core/do ~@body))))
 
 (defn ^:macro let
   "A `let` alternative that always returns promise and waits for all the
@@ -177,8 +177,8 @@
    'deferred (sci/copy-var p/deferred pns)
    'delay (sci/copy-var p/delay pns)
    'do (sci/copy-var do! pns)
+   'do* (sci/copy-var do! pns)
    'do! (sci/copy-var do! pns)
-   'error (sci/copy-var p/error pns)
    'finally (sci/copy-var p/finally pns)
    'future (sci/copy-var future pns)
    'thread-call (sci/copy-var p/thread-call pns)
