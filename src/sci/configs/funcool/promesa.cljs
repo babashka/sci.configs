@@ -7,6 +7,7 @@
   (:require [clojure.core :as c]
             [promesa.core :as p]
             [promesa.exec :as exec]
+            [promesa.impl :as impl]
             [promesa.protocols :as pt]
             [sci.core :as sci]))
 
@@ -18,28 +19,33 @@
   to the last expression. Always awaiting the result of each
   expression."
   [_ _ & exprs]
-  `(pt/-bind
-    (pt/-promise nil)
-    (fn [_#]
-      ~(condp = (count exprs)
-         0 `(pt/-promise nil)
-         1 `(pt/-promise ~(first exprs))
-         (reduce (fn [acc e]
-                   `(pt/-bind (pt/-promise ~e) (fn [_#] ~acc)))
-                 `(pt/-promise ~(last exprs))
-                 (reverse (butlast exprs)))))))
+  (condp = (count exprs)
+    0 `(impl/resolved nil)
+    1 `(pt/-promise ~(first exprs))
+    (reduce (fn [acc e]
+              `(pt/-mcat (pt/-promise ~e) (fn [_#] ~acc)))
+            `(pt/-promise ~(last exprs))
+            (reverse (butlast exprs)))))
+
+(defn ^:macro let*
+  "An exception unsafe let-like macro. Supposes that we are already
+  wrapped in promise context so avoids defensive wrapping."
+  [_ _ bindings & body]
+  (assert (even? (count bindings)) (str "Uneven binding vector: " bindings))
+  (c/->> (reverse (partition 2 bindings))
+         (reduce (fn [acc [l r]]
+                   `(pt/-mcat (pt/-promise ~r) (fn [~l] ~acc)))
+                 `(do* ~@body))))
 
 (defn ^:macro let
   "A `let` alternative that always returns promise and waits for all the
   promises on the bindings."
   [_ _ bindings & body]
-  `(pt/-bind
-    (pt/-promise nil)
-    (fn [_#]
-      ~(c/->> (reverse (partition 2 bindings))
-              (reduce (fn [acc [l r]]
-                        `(pt/-bind (pt/-promise ~r) (fn [~l] ~acc)))
-                      `(promesa.core/do! ~@body))))))
+  (if (seq bindings)
+    `(pt/-mcat
+      (pt/-promise nil)
+      (fn [_#] (promesa.core/let* ~bindings ~@body)))
+    `(promesa.core/do ~@body)))
 
 (defn ^:macro ->
   "Like the clojure.core/->, but it will handle promises in values
@@ -161,47 +167,56 @@
 
 (def promesa-namespace
   {'*loop-run-fn* loop-run-fn
-   '->            (sci/copy-var -> pns)
-   '->>           (sci/copy-var ->> pns)
-   'all           (sci/copy-var p/all pns)
-   'any           (sci/copy-var p/any pns)
-   'catch         (sci/copy-var p/catch pns)
-   'chain         (sci/copy-var p/chain pns)
-   'create        (sci/copy-var p/create pns)
-   'deferred      (sci/copy-var p/deferred pns)
-   'delay         (sci/copy-var p/delay pns)
-   'do            (sci/copy-var do! pns)
-   'do!           (sci/copy-var do! pns)
-   'error         (sci/copy-var p/error pns)
-   'finally       (sci/copy-var p/finally pns)
-   'future        (sci/copy-var future pns)
-   'thread-call   (sci/copy-var p/thread-call pns)
-   'handle        (sci/copy-var p/handle pns)
-   'let           (sci/copy-var let pns)
-   'loop          (sci/copy-var loop pns)
-   'map           (sci/copy-var p/map pns)
-   'mapcat        (sci/copy-var p/mapcat pns)
-   'promise       (sci/copy-var p/promise pns)
-   'promise?      (sci/copy-var p/promise? pns)
-   'race          (sci/copy-var p/race pns)
-   'recur         (sci/copy-var recur pns)
-   'reject!       (sci/copy-var p/reject! pns)
-   'rejected      (sci/copy-var p/rejected pns)
-   'resolve!      (sci/copy-var p/resolve! pns)
-   'resolved      (sci/copy-var p/resolved pns)
-   'run!          (sci/copy-var p/run! pns)
-   'then          (sci/copy-var p/then pns)
-   'thenable?     (sci/copy-var p/thenable? pns)
-   'timeout       (sci/copy-var p/timeout pns)
-   'with-redefs   (sci/copy-var with-redefs pns)
-   'wrap          (sci/copy-var p/wrap pns)
-   'doseq         (sci/copy-var doseq pns)})
+   '-> (sci/copy-var -> pns)
+   '->> (sci/copy-var ->> pns)
+   'all (sci/copy-var p/all pns)
+   'any (sci/copy-var p/any pns)
+   'catch (sci/copy-var p/catch pns)
+   'chain (sci/copy-var p/chain pns)
+   'create (sci/copy-var p/create pns)
+   'deferred (sci/copy-var p/deferred pns)
+   'delay (sci/copy-var p/delay pns)
+   'do (sci/copy-var do! pns)
+   'do! (sci/copy-var do! pns)
+   'error (sci/copy-var p/error pns)
+   'finally (sci/copy-var p/finally pns)
+   'future (sci/copy-var future pns)
+   'thread-call (sci/copy-var p/thread-call pns)
+   'handle (sci/copy-var p/handle pns)
+   'let (sci/copy-var let pns)
+   'let* (sci/copy-var let* pns)
+   'loop (sci/copy-var loop pns)
+   'map (sci/copy-var p/map pns)
+   'mapcat (sci/copy-var p/mapcat pns)
+   'promise (sci/copy-var p/promise pns)
+   'promise? (sci/copy-var p/promise? pns)
+   'race (sci/copy-var p/race pns)
+   'recur (sci/copy-var recur pns)
+   'reject! (sci/copy-var p/reject! pns)
+   'rejected (sci/copy-var p/rejected pns)
+   'resolve! (sci/copy-var p/resolve! pns)
+   'resolved (sci/copy-var p/resolved pns)
+   'run! (sci/copy-var p/run! pns)
+   'then (sci/copy-var p/then pns)
+   'thenable? (sci/copy-var p/thenable? pns)
+   'timeout (sci/copy-var p/timeout pns)
+   'with-redefs (sci/copy-var with-redefs pns)
+   'wrap (sci/copy-var p/wrap pns)
+   'doseq (sci/copy-var doseq pns)})
+
+(def pims (sci/create-ns 'promesa.impl nil))
 
 (def promesa-protocols-namespace
-  {'-bind (sci/copy-var pt/-bind ptns)
+  {'-mcat (sci/copy-var pt/-mcat ptns)
    '-promise (sci/copy-var pt/-promise ptns)})
 
+(def promesa-impl-namespace
+  {'resolved (sci/copy-var impl/resolved ptns)})
+
 (def namespaces {'promesa.core promesa-namespace
-                 'promesa.protocols promesa-protocols-namespace})
+                 ;; exposed for macros that expand to it
+                 'promesa.protocols promesa-protocols-namespace
+                 ;; exposed for macros that expand to it
+                 'promesa.impl promesa-impl-namespace})
 
 (def config {:namespaces namespaces})
