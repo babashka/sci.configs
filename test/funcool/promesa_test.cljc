@@ -24,4 +24,4 @@
                (.then (fn [v]
                         (is (= 5 v))))
                (.catch (fn [_] (is false)))
-               (p/finally done)))))
+               (.finally done)))))
