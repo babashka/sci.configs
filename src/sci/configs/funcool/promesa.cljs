@@ -179,6 +179,7 @@
    'do (sci/copy-var do! pns)
    'do* (sci/copy-var do! pns)
    'do! (sci/copy-var do! pns)
+   'error (sci/copy-var p/error pns)
    'finally (sci/copy-var p/finally pns)
    'future (sci/copy-var future pns)
    'thread-call (sci/copy-var p/thread-call pns)
