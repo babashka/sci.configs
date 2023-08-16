@@ -9,19 +9,24 @@
 
 (deftest future-test
   (let [ctx (ctx-fn)
-        p (sci/eval-string* ctx "
+        [p f] (sci/eval-string* ctx "
 (ns example
   (:require
     [promesa.core :as p]))
 
+(def p
 (p/do
 1 2 3
 (p/let [x (p/resolved (inc 2))
         y (inc x)]
-  (inc y)))")]
+  (inc y))))
+
+[p (fn [] @p)]")]
     (async done
            (-> p
                (.then (fn [v]
                         (is (= 5 v))))
                (.catch (fn [_] (is false)))
+               (.then (fn [_]
+                        (is (= 5 (f)))))
                (.finally done)))))
