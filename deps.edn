@@ -12,5 +12,5 @@
             :extra-paths ["test" "cljs-test-runner-out/gen"]
             :main-opts ["-m" "cljs-test-runner.main" "-d" "test"]}
            :cljs-test-runner-advanced
-           {:main-opts ["-m" "cljs-test-runner.main" "-d" "test" "-c" "{:optimizations :advanced}"]}}
+           {:main-opts ["-m" "cljs-test-runner.main" "-d" "test" "-c" "{:optimizations :advanced :language-in :ecmascript-next}"]}}
  :deps {}}
