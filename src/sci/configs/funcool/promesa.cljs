@@ -197,6 +197,7 @@
    'recur (sci/copy-var recur pns)
    'reject! (sci/copy-var p/reject! pns)
    'rejected (sci/copy-var p/rejected pns)
+   'rejected? (sci/copy-var p/rejected? pns)
    'resolve! (sci/copy-var p/resolve! pns)
    'resolved (sci/copy-var p/resolved pns)
    'resolved? (sci/copy-var p/resolved? pns)
