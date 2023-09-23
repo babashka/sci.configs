@@ -1,0 +1,8 @@
+{:deps     {:aliases [:test :dev]}
+ :nrepl    {:port 9000}
+ :dev-http {8081 "www"}
+ :builds   {:dev     {:target     :browser
+                       :output-dir "www/js/dev"
+                       :asset-path "/js/dev"
+                       :modules    {:dev {:init-fn development/init}}
+                       :devtools   {:after-load development/reload}}}}

@@ -5,3 +5,6 @@
 .cpcache
 cljs-test-runner-out
 node_modules
+www/js/
+.calva/
+.portal/

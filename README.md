@@ -150,6 +150,10 @@ New functions added to clojure.core in version 1.11
 
 `npm install` and `bb test`
 
+### Development
+
+You can play with your SCI code and configs in a cljs REPL. In Calva, run Jack-in to a shadow-cljs repl and choose the `:dev` build. Elsewhere, run `npx shadow-cljs watch dev` and then connect to its nrepl at port 9000. Access the web page that Shadow serves at http://localhost:8081/ and then eval your code using `development.cljs`.
+
 ## License
 
 The configurations are licensed under the same licenses as the libraries they
