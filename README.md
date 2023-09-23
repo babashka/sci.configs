@@ -50,6 +50,15 @@ Public API:
 - `js-interop-namespace`
 - `namespaces`
 
+### [com.fulcrologic/fulcro](https://github.com/fulcro/fulcro)
+
+Namespace: `sci.configs.fulcro.fulcro`
+
+Public API:
+
+- `config`
+- `namespaces`
+
 ### [funcool/promesa](https://github.com/funcool/promesa)
 
 Namespace: `sci.configs.funcool.promesa`
