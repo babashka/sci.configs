@@ -1,15 +1,13 @@
 (ns sci.configs.fulcro.component
   (:require
-    [cljs.spec.alpha :as s]
-    [clojure.set :as set]
-    [clojure.walk :refer [prewalk]]
-    [edn-query-language.core :as eql]
-    [sci.core :as sci]
-    [com.fulcrologic.fulcro.components :as comp]
-    [com.fulcrologic.fulcro.algorithms.do-not-use :as util]
-    [cljs.analyzer :as ana]
-    [taoensso.timbre :as log]
-    [sci.impl.namespaces :as namespaces]))
+   [cljs.spec.alpha :as s]
+   [clojure.set :as set]
+   [clojure.walk :refer [prewalk]]
+   [edn-query-language.core :as eql]
+   [sci.core :as sci]
+   [com.fulcrologic.fulcro.components :as comp]
+   [com.fulcrologic.fulcro.algorithms.do-not-use :as util]
+   [sci.configs.fulcro.fulcro-sci-helpers :as ana]))
 
 (def cljs? (constantly true)) ; was `(:ns &env)` but sci's &env lacks :ns
 
@@ -316,8 +314,8 @@
       `(do
          (declare ~sym)
          (let [options# ~options-map]
-           (defonce ~(vary-meta sym assoc :doc doc :jsdoc ["@constructor"])
-                    (comp/react-constructor (get options# :initLocalState)))
+           (def ~(vary-meta sym assoc :doc doc :jsdoc ["@constructor"]) ; JH: BEWARE `defonce` will prevent changes in :advanced optimiz.
+             (comp/react-constructor (get options# :initLocalState)))
            (com.fulcrologic.fulcro.components/configure-component! ~sym ~fqkw options#)))
 
       :else
@@ -330,7 +328,9 @@
 (defn ^:sci/macro defsc [_&form &env & args]
   (try
     ;; Note: In cljs, env would have `:ns` but not so in SCI, yet Fulcro looks at it => add
-    (defsc* (some->> sci.core/ns deref str (assoc &env :ns)) args)
+    (let [ns-name (some->> sci.core/ns deref str)
+          fake-ns (when (seq ns-name) {:name ns-name})]
+     (defsc* (assoc &env :ns fake-ns) args))
     (catch :default e
       (if (contains? (ex-data e) :tag)
         (throw e)

@@ -1,5 +1,5 @@
 (ns sci.configs.fulcro.mutations
-  (:require [cljs.analyzer :as ana]
+  (:require [sci.configs.fulcro.fulcro-sci-helpers :as ana]
             [cljs.spec.alpha :as s]
             [clojure.string :as str]
             [sci.core :as sci]

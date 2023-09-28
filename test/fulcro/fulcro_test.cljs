@@ -15,11 +15,12 @@
     [com.fulcrologic.fulcro.algorithms.denormalize :as fdn]
     [com.fulcrologic.fulcro.application :as app]
     [com.fulcrologic.fulcro.components :as comp :refer [defsc]]
+    [com.fulcrologic.fulcro.react.version18 :refer [with-react18]]
     [com.fulcrologic.fulcro.dom :as dom]))
                                   
 (defsc Root [this props] (dom/h3 \"Hello from Fulcro!\"))
 (defn build-ui-tree []
   (let [client-db (comp/get-initial-state Root {})]
     (fdn/db->tree (comp/get-query Root client-db) client-db client-db)))
-(comp/with-parent-context (app/fulcro-app)
+(comp/with-parent-context (-> (app/fulcro-app) with-react18)
   (dom/render-to-str ((comp/factory Root) (build-ui-tree))))")))))

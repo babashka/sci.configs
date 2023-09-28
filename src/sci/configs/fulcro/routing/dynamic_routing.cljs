@@ -1,5 +1,5 @@
 (ns sci.configs.fulcro.routing.dynamic-routing
-  (:require [cljs.analyzer :as ana]
+  (:require [sci.configs.fulcro.fulcro-sci-helpers :as ana]
             [com.fulcrologic.fulcro.raw.components :as rc]
             [com.fulcrologic.fulcro.routing.dynamic-routing :as dr]
             [com.fulcrologic.fulcro.ui-state-machines :as uism]

@@ -40,6 +40,7 @@
             [sci.configs.fulcro.networking.http-remote :as http-remote]
             [sci.configs.fulcro.raw.component :as rc]
             [sci.configs.fulcro.react.hooks :as hooks]
+            [sci.configs.fulcro.react.version18 :as version18]
             [sci.configs.fulcro.routing.dynamic-routing :as dr]
             [sci.configs.fulcro.ui-state-machines :as uism]
             [sci.core :as sci]
@@ -69,6 +70,7 @@
    hooks/namespaces
    stx/namespaces
    tempid/namespaces
-   uism/namespaces))
+   uism/namespaces
+   version18/namespaces))
 
 (def config {:namespaces namespaces})
