@@ -50,6 +50,15 @@ Public API:
 - `js-interop-namespace`
 - `namespaces`
 
+### [com.fulcrologic/fulcro](https://github.com/fulcro/fulcro)
+
+Namespace: `sci.configs.fulcro.fulcro`
+
+Public API:
+
+- `config`
+- `namespaces`
+
 ### [funcool/promesa](https://github.com/funcool/promesa)
 
 Namespace: `sci.configs.funcool.promesa`
@@ -140,6 +149,10 @@ New functions added to clojure.core in version 1.11
 ## Contributing
 
 `npm install` and `bb test`
+
+### Development
+
+You can play with your SCI code and configs in a cljs REPL. In Calva, run Jack-in to a shadow-cljs repl and choose the `:dev` build. Elsewhere, run `bb dev` and then connect to its nrepl at port 9000. Access the web page that Shadow serves at http://localhost:8081/ and then eval your code using `development.cljs`.
 
 ## License
 

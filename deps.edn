@@ -1,8 +1,12 @@
-{:aliases {:test {:extra-paths ["test"]
+{:aliases {:dev {:extra-paths ["dev"]
+                 :extra-deps {thheller/shadow-cljs {:mvn/version "2.25.7"}}}
+           :shadow-cli {:main-opts ["-m" "shadow.cljs.devtools.cli"]}
+           :test {:extra-paths ["test"]
                   :extra-deps {org.babashka/sci {:git/url "https://github.com/babashka/sci"
                                                  :git/sha "987910fb38fdd166865458c3fd4b468a22fb9992"}
                                org.clojure/clojurescript {:mvn/version "1.11.51"}
                                applied-science/js-interop {:mvn/version "0.3.3"}
+                               com.fulcrologic/fulcro {:mvn/version "3.6.10"}
                                funcool/promesa {:git/url "https://github.com/funcool/promesa"
                                                 :git/sha "e503874b154224ce85b223144e80b697df91d18e"}
                                reagent/reagent {:mvn/version "1.1.0"}
