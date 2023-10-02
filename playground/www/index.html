@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8" />
+  <title>SCI Playground</title>
+  <link rel="stylesheet" href="/css/blog.css">
+</head>
+
+<body>
+  <h1>SCI Playground</h1>
+  <p>Write and evaluate SCI Clojure using any of the libraries in sci.configs
+    in the editor below. Use Cmd / Ctr - Enter to evaluate.</p>
+  <p>Supported libraries: <span id="libs">todo</span>.</p>
+
+  <pre><code id="code">(ns test1
+      (:require
+        [applied-science.js-interop :as j]
+        [promesa.core :as p]
+        [cljs-bean.core :refer [bean ->clj ->js]]
+        [re-frame.core :as rf]
+        [re-frame.db :as r.db]
+        [reagent.core :as r]
+        [reagent.dom.server :as rds]
+        [reagent.debug]
+        [reagent.ratom :as ratom]
+        [datascript.core :as d]
+        [datascript.db :as d.db]   
+        [com.fulcrologic.fulcro.application :as app]
+        [com.fulcrologic.fulcro.components :as comp :refer [defsc]]
+        [com.fulcrologic.fulcro.dom :as dom]))
+    (defsc Root [this props]
+     (dom/div (dom/h3 "Hello from SCI!")
+       (dom/p "Here you can play with Fulcro and Reagent apps and much more!")))
+    (app/mount! (app/fulcro-app) Root "app")
+    </code></pre>
+  <div id="app" style="border: 1px dashed; padding: 0.4rem">
+    <em>You can use this <code>&lt;div id="app"&gt;</code> to render DOM.</em>
+  </div>
+</body>
+<script src="js/playground.js"></script>
+
+</html>
