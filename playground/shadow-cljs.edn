@@ -1,0 +1,11 @@
+{:deps     {:aliases [:dev]}
+ :nrepl    {:port 9000}
+ :dev-http {8081 "www"}
+ :builds   {:playground {:compiler-options {:output-feature-set :es8
+                                            :optimizations :advanced
+                                            :source-map true
+                                            :output-wrapper false}
+                         :target     :browser
+                         :output-dir "www/js"
+                         :modules    {:playground {:init-fn playground/init}}
+                         :devtools   {:after-load playground/reload}}}}

@@ -1,0 +1,6 @@
+{:tasks
+ {build {:doc "Build the static 'SCI Playground' site with sci and an editor"
+         :task (do (shell "yarn install")
+                   (clojure "-M:dev:shadow-cli release playground")
+                   (println "Built www"))}
+  watch (clojure "-M:dev:shadow-cli watch playground")}}
