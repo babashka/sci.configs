@@ -9,7 +9,7 @@
 <body>
   <h1>SCI Playground</h1>
   <p>Write and evaluate SCI Clojure using any of the libraries in sci.configs
-    in the editor below. Use Cmd / Ctr - Enter to evaluate.</p>
+    in the editor below. Use <kbd>Cmd / Ctr - Enter</kbd> to evaluate.</p>
   <p>Supported libraries: <span id="libs">todo</span>.</p>
 
   <pre><code id="code">(ns test1
@@ -36,6 +36,21 @@
   <div id="app" style="border: 1px dashed; padding: 0.4rem">
     <em>You can use this <code>&lt;div id="app"&gt;</code> to render DOM.</em>
   </div>
+
+  <h4 id="gist-info">Auto-evaluation GitHub gists</h4>
+  <p>You can automatically load and evaluate a <a href="https://gist.github.com/discover">gist</a>
+    by appending <code>?gist=GIST-ID</code> to the URL. All clj* files from the gist are loaded 
+    into the editor in the order of their names and evaluated automatically. You can
+    <a href="/?gist=5ff187847756263be17d7c4c19f978b5">try our test gist (by clicking here)</a>.
+  </p>
+  <p>
+    Notice that for security reasons, auto-evaluated gists lack access to <code>js/*</code>
+    and some JS libs, unless you include <code>&amp;unlimited</code> in the URL.
+    This is not true when you evaluate them manually.
+  </p>
+  <p>BEWARE: Evaluating code from a random source is dangerous, even though SCI does its best to sandbox
+    scripts.
+  </p>
 </body>
 <script src="js/playground.js"></script>
 
