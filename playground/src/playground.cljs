@@ -59,27 +59,21 @@
    #'sci.configs.reagent.reagent-dom-server/config
    #'sci.configs.tonsky.datascript/config])
 
-(defn make-ctx [{:keys [limited?]}]
+(def sci-ctx
   (->> all-configs
        (map deref)
        (reduce
         sci/merge-opts
-        (sci/init (if limited?
-                    {}
-                    {:classes {'js js/globalThis :allow :all}
-                     :js-libs {"react" react
-                               "react-dom" react-dom}})))))
-
-(def sci-ctx (make-ctx nil))
-(def limited-sci-ctx (make-ctx {:limited? true}))
+        (sci/init {:classes {'js js/globalThis :allow :all}
+                   :js-libs {"react" react
+                             "react-dom" react-dom}}))))
 
 (defn eval-code
-  ([code] (eval-code code nil))
-  ([code {:keys [limited?]}]
-   (try (sci/eval-string* (if limited? limited-sci-ctx sci-ctx) code)
+  ([code]
+   (try (sci/eval-string* sci-ctx code)
         (catch :default e
           (try (js/console.log "Evaluation failed:" (ex-message e)
-                               (some-> e ex-data clj->js)) 
+                               (some-> e ex-data clj->js))
                (catch :default _))
           {::error (str (.-message e)) :data (ex-data e)}))))
 
@@ -195,18 +189,11 @@
       (do
         (set! (.-textContent code-el) "Loading gist...")
         (-> (async-fetch-gist gist-id)
-            (p/then #(do
-                       (let [unlimited? (->> js/document .-location .-search
-                                             (re-find #"[?&]unlimited(\W|$)")
-                                             second)
-                             res (eval-code % (when-not unlimited? {:limited? true}))]
-                         (println "Initial evaluation => " res)
-                         (when (::error res)
-                           (set! (.-textContent (js/document.getElementById "app")) 
-                                 (str "Auto-evaluating the gist failed. Notice that auto-eval lacks some libs"
-                                      " and  access to js/*, unless you included `&unlimited` in the URL."
-                                      " Cause: "
-                                      (::error res)))))
+            (p/then #(let [res (eval-code %)]
+                       (println "Initial evaluation => " res)
+                       (when (::error res)
+                         (set! (.-textContent (js/document.getElementById "app"))
+                               (str "Auto-evaluating the gist failed. Cause: " (::error res))))
                        (bind-editor! code-el %)))
             (p/catch #(set! (.-textContent code-el) (str "Loading gist FAILED: " %)))))
       (bind-editor! code-el code)))
