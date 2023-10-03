@@ -66,7 +66,9 @@
         sci/merge-opts
         (sci/init {:classes {'js js/globalThis :allow :all}
                    :js-libs {"react" react
-                             "react-dom" react-dom}}))))
+                             "react-dom" react-dom}}))
+       ;; in .cljc, take the :cljs branch; here b/c of a bug in SCI that loses it on merge-opts
+       (#(assoc % :features #{:cljs}))))
 
 (defn eval-code
   ([code]
