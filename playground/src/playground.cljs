@@ -33,6 +33,9 @@
    ["react-dom" :as react-dom]
 
    [nextjournal.clojure-mode :as cm-clj]
+
+   ;; Used libs
+   [promesa.core :as p]
    ))
 
 ;; Necessary to avoid the error 'Attempting to call unbound fn: #'clojure.core/*print-fn*'
@@ -56,22 +59,29 @@
    #'sci.configs.reagent.reagent-dom-server/config
    #'sci.configs.tonsky.datascript/config])
 
-(def sci-ctx
+(defn make-ctx [{:keys [limited?]}]
   (->> all-configs
        (map deref)
        (reduce
         sci/merge-opts
-        (sci/init {:classes {'js js/globalThis :allow :all}
-                   :js-libs {"react" react
-                             "react-dom" react-dom}}))))
+        (sci/init (if limited?
+                    {}
+                    {:classes {'js js/globalThis :allow :all}
+                     :js-libs {"react" react
+                               "react-dom" react-dom}})))))
 
-(defn eval-code [code]
-  (try (sci/eval-string* sci-ctx code)
-       (catch :default e
-         (try (js/console.log "Evaluation failed:" (ex-message e)
-                              (some-> e ex-data clj->js)) 
-              (catch :default _))
-         {::error (str (.-message e)) :data (ex-data e)})))
+(def sci-ctx (make-ctx nil))
+(def limited-sci-ctx (make-ctx {:limited? true}))
+
+(defn eval-code
+  ([code] (eval-code code nil))
+  ([code {:keys [limited?]}]
+   (try (sci/eval-string* (if limited? limited-sci-ctx sci-ctx) code)
+        (catch :default e
+          (try (js/console.log "Evaluation failed:" (ex-message e)
+                               (some-> e ex-data clj->js)) 
+               (catch :default _))
+          {::error (str (.-message e)) :data (ex-data e)}))))
 
 (defn eval-all [on-result  x]
   (on-result (some->> (.-doc (.-state x)) str eval-code))
@@ -147,25 +157,60 @@
        sort
        (str/join ", ")))
 
+(defn gist-json->code [json]
+  (->> json
+       .-files
+       js/Object.values
+       seq
+       (map (fn [o] (js->clj o :keywordize-keys true)))
+       (filter (comp #{"Clojure"} :language)) ; incl. clj, cljs, cljc
+       (sort-by :filename) ; we started with a map, which has no natural order
+       (map #(do (assert (not (:truncated %)) "Can't handle truncated files")
+                 (str ";; " (:filename %) "\n" (:content %))))
+       (str/join "\n;;---\n")))
+
+(defn async-fetch-gist [gist-id]
+  (p/let [resp (js/fetch (str "https://api.github.com/gists/" gist-id)
+                         {:headers {"Accept" "application/vnd.github+json"
+                                    "X-GitHub-Api-Version" "2022-11-28"}})
+          _ (when-not (.-ok resp) (throw (ex-info (str "Bad HTTP status " 
+                                                       (.-status resp) " " 
+                                                       (.-statusText resp)) 
+                                                  {})))
+          json (.json resp)
+          code (gist-json->code json)]
+    (if (seq code)
+      code
+      "; No Clojure code found in the gist.")))
+
 (defn ^:export init []
   (let [code-el (js/document.getElementById "code")
         code (.-textContent code-el)
         libs-el (js/document.getElementById "libs")]
     (set! (.-textContent libs-el) (list-libraries all-configs))
-    (bind-editor! code-el code))
+    (if-let [gist-id
+             (->> js/document .-location .-search
+                  (re-find #"[?&]gist=(\w+)")
+                  second)]
+      (do
+        (set! (.-textContent code-el) "Loading gist...")
+        (-> (async-fetch-gist gist-id)
+            (p/then #(do
+                       (let [unlimited? (->> js/document .-location .-search
+                                             (re-find #"[?&]unlimited(\W|$)")
+                                             second)
+                             res (eval-code % (when-not unlimited? {:limited? true}))]
+                         (println "Initial evaluation => " res)
+                         (when (::error res)
+                           (set! (.-textContent (js/document.getElementById "app")) 
+                                 (str "Auto-evaluating the gist failed. Notice that auto-eval lacks some libs"
+                                      " and  access to js/*, unless you included `&unlimited` in the URL."
+                                      " Cause: "
+                                      (::error res)))))
+                       (bind-editor! code-el %)))
+            (p/catch #(set! (.-textContent code-el) (str "Loading gist FAILED: " %)))))
+      (bind-editor! code-el code)))
   (println "Init run"))
 
 (defn ^:export reload []
   (println "Reload run (noop)"))
-
-(comment
-  
-  (def X #'sci.configs.cljs.pprint/config)
-  
-
-  (-> X meta :ns name 
-      (clojure.string/replace-first "sci.configs." ""))
-
-
-  
-  )
