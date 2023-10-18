@@ -207,7 +207,9 @@
    'timeout (sci/copy-var p/timeout pns)
    'with-redefs (sci/copy-var with-redefs pns)
    'wrap (sci/copy-var p/wrap pns)
-   'doseq (sci/copy-var doseq pns)})
+   'doseq (sci/copy-var doseq pns)
+   'wait-all (sci/copy-var p/wait-all pns)
+   'wait-all* (sci/copy-var p/wait-all* pns)})
 
 (def pims (sci/create-ns 'promesa.impl nil))
 
