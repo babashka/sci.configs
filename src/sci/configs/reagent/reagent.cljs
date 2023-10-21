@@ -59,6 +59,9 @@
          ~@add-destroy
          ~res))))
 
+(defn ^:macro reaction [& body]
+  `(reagent.ratom/make-reaction (fn [] ~@body)))
+
 (def rns (sci/create-ns 'reagent.core nil))
 
 (def reagent-namespace
@@ -66,6 +69,7 @@
    'create-element (sci/copy-var r/create-element rns)
    'as-element (sci/copy-var r/as-element rns)
    'with-let (sci/copy-var with-let rns)
+   'reaction (sci/copy-var reaction rns)
    'class-names (sci/copy-var r/class-names rns)
    'cursor (sci/copy-var r/cursor rns)
    'create-class (sci/copy-var r/create-class rns)
