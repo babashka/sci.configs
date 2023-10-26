@@ -44,7 +44,7 @@
 (enable-console-print!)
 (sci/alter-var-root sci/print-fn (constantly *print-fn*))
 (sci/alter-var-root sci/print-err-fn (constantly *print-err-fn*))
-
+(sci/enable-unrestricted-access!)
 ;; ------------------------------------------------------------ SCI eval
 
 (def all-configs ; vars so that we can extract ns info

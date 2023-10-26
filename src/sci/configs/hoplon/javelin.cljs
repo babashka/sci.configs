@@ -7,7 +7,7 @@
             [cljs.pprint :as p]
             [clojure.string :as str]
             [javelin.core])
-  (:require-macros [sci.configs.macros :refer [defmacro]]
+  (:require-macros [sci.configs.macros :as m :refer [defmacro]]
                    [sci.configs.hoplon.javelin :refer [with-let*]]))
 
 (def Exception js/Error)
@@ -69,19 +69,19 @@
   [env form]
   (prewalk (partial macroexpand* env) form))
 
-(defmacro macroexpand-all
+(m/defmacro macroexpand-all
   "Fully expand all CLJS macros contained in form."
   [form]
   (macroexpand-all* &env form))
 
-(defmacro mx
+(m/defmacro mx
   "Expand all macros in form and pretty-print them (as code)."
   [form]
   `(println
      ~(with-out-str
         (p/write (macroexpand-all* &env form) :dispatch p/code-dispatch))))
 
-(defmacro mx2
+(m/defmacro mx2
   "Expand all macros in form and pretty-print them (as data)."
   [form]
   `(println
@@ -216,31 +216,31 @@
 
 ;; javelin CLJS macros ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defmacro with-let
+(m/defmacro with-let
   "Binds resource to binding and evaluates body.  Then, returns
   resource.  It's a cross between doto and with-open."
   [[binding resource] & body]
   `(let [~binding ~resource] ~@body ~binding))
 
-(defmacro cell=
+(m/defmacro cell=
   ([expr]
    (cell* expr &env))
   ([expr f]
    `(javelin.core/with-let [c# (javelin.core/cell= ~expr)]
       (set! (.-update c#) ~f))))
 
-(defmacro set-cell!=
+(m/defmacro set-cell!=
   ([c expr]
    `(set-cell!= ~c ~expr nil))
   ([c expr updatefn]
    (let [[f args] (hoist expr &env)]
      `(set-formula! ~c ~f [~@args] ~updatefn))))
 
-(defmacro defc
+(m/defmacro defc
   ([sym expr] `(def ~sym (cell ~expr)))
   ([sym doc expr] `(def ~sym ~doc (cell ~expr))))
 
-(defmacro defc=
+(m/defmacro defc=
   ([sym expr] `(def ~sym (cell= ~expr)))
   ([sym doc & [expr f]]
    (let [doc? (string? doc)
@@ -249,7 +249,7 @@
          doc  (when doc? [doc])]
      `(def ~sym ~@doc (cell= ~expr ~@f)))))
 
-(defmacro formula-of
+(m/defmacro formula-of
   "ALPHA: this macro may change.
 
   Given a vector of dependencies and one or more body expressions, emits a
@@ -277,7 +277,7 @@
           "first argument must be a vector of symbols")
   `((formula (fn [~@deps] ~@body)) ~@deps))
 
-(defmacro formulet
+(m/defmacro formulet
   "ALPHA: this macro may change.
 
   Given a vector of binding-form/dependency pairs and one or more body
@@ -310,26 +310,26 @@
     `((formula (fn [~@(map first binding-pairs)] ~@body))
       ~@(map second binding-pairs))))
 
-(defmacro ^:private cell-let-1 [[bindings c] & body]
+(m/defmacro ^:private cell-let-1 [[bindings c] & body]
   (let [syms  (bind-syms bindings)
         dcell `((formula (fn [~bindings] [~@syms])) ~c)]
     `(let [[~@syms] (cell-map identity ~dcell)] ~@body)))
 
-(defmacro cell-let
+(m/defmacro cell-let
   [[bindings c & more] & body]
   (if-not (seq more)
-    `(cell-let-1 [~bindings ~c] ~@body)
-    `(cell-let-1 [~bindings ~c]
-                 (cell-let ~(vec more) ~@body))))
+    `(javelin.core/cell-let-1 [~bindings ~c] ~@body)
+    `(javelin.core/cell-let-1 [~bindings ~c]
+                              (javelin.core/cell-let ~(vec more) ~@body))))
 
-(defmacro dosync
+(m/defmacro dosync
   "Evaluates the body within a Javelin transaction. Propagation of updates
   to formula cells is deferred until the transaction is complete. Input
   cells *will* update during the transaction. Transactions may be nested."
   [& body]
   `(dosync* (fn [] ~@body)))
 
-(defmacro cell-doseq
+(m/defmacro cell-doseq
   "Takes a vector of binding-form/collection-cell pairs and one or more body
   expressions, similar to clojure.core/doseq. Iterating over the collection
   cells produces a sequence of items that may grow, shrink, or update over
@@ -377,7 +377,7 @@
   (if (= 2 (count bindings))
     `(cell-doseq*
        ((formula seq) ~(second bindings))
-       (fn [item#] (cell-let [~(first bindings) item#] ~@body)))
+       (fn [item#] (javelin.core/cell-let [~(first bindings) item#] ~@body)))
     (let [pairs   (partition 2 bindings)
           lets    (->> pairs (filter (comp (partial = :let) first)) (mapcat second))
           binds*  (->> pairs (take-while (complement (comp keyword? first))))
@@ -388,10 +388,10 @@
           fors    (-> (->> binds* (map first)) (interleave gens) (concat mods*))]
       `(cell-doseq*
          ((formula (fn [~@gens] (for [~@fors] [~@syms]))) ~@exprs)
-         (fn [item#] (cell-let [[~@syms] item#, ~@lets] ~@body))))))
+         (fn [item#] (javelin.core/cell-let [[~@syms] item#, ~@lets] ~@body))))))
 
 ;; FIXME: this macro doesn't work correctly, maybe mutation observers?
-(defmacro prop-cell
+(m/defmacro prop-cell
   ([prop]
    `(let [ret# (cell ~prop)]
       (js/setInterval #(reset! ret# ~prop) 100)
@@ -407,11 +407,15 @@
         100)
       setter#)))
 
+(prn :dosync dosync)
+
 (def javelin-core-ns
   (assoc (sci/copy-ns javelin.core jns)
-         'dosync (sci/copy-var dosync jns)
-         'with-let (sci/copy-var with-let jns)
-         'cell= (sci/copy-var cell= jns)))
+         'foo 'bar
+         'dosync (sci/copy-var sci.configs.hoplon.javelin/dosync jns)
+         'with-let (sci/copy-var sci.configs.hoplon.javelin/with-let jns)
+         'cell= (sci/copy-var cell= jns)
+         ))
 
 (def config {:namespaces {'javelin.core javelin-core-ns}})
 

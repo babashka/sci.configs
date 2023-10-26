@@ -3,7 +3,7 @@
            :shadow-cli {:main-opts ["-m" "shadow.cljs.devtools.cli"]}
            :test {:extra-paths ["test"]
                   :extra-deps {org.babashka/sci {:git/url "https://github.com/babashka/sci"
-                                                 :git/sha "8da8f44c41f507e56256b23d0a05c0172d881859"}
+                                                 :git/sha "0f24b4b73d68a5c5a0df6e984377764dbd076dd5"}
                                org.clojure/clojurescript {:mvn/version "1.11.51"}
                                applied-science/js-interop {:mvn/version "0.3.3"}
                                com.fulcrologic/fulcro {:mvn/version "3.6.10"}

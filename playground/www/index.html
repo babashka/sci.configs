@@ -24,10 +24,11 @@
         [reagent.debug]
         [reagent.ratom :as ratom]
         [datascript.core :as d]
-        [datascript.db :as d.db]   
+        [datascript.db :as d.db]
         [com.fulcrologic.fulcro.application :as app]
         [com.fulcrologic.fulcro.components :as comp :refer [defsc]]
-        [com.fulcrologic.fulcro.dom :as dom]))
+        [com.fulcrologic.fulcro.dom :as dom]
+        [javelin.core :as jc]))
     (defsc Root [this props]
      (dom/div (dom/h3 "Hello from SCI!")
        (dom/p "Here you can play with Fulcro and Reagent apps and much more!")))
@@ -42,9 +43,6 @@
     by appending <code>?gist=GIST-ID</code> to the URL. All clj* files from the gist are loaded
     into the editor in the order of their names and evaluated automatically. You can
     <a href="?gist=5ff187847756263be17d7c4c19f978b5">try our test gist (by clicking here)</a>.
-  </p>
-  <p>BEWARE: Evaluating code from a random source is dangerous.
-    The scripts have access to <code>js/{document, window, ...}</code>.
   </p>
   <p><small><a href="https://github.com/babashka/sci.configs/tree/main/playground">Playground soucre code</a></small></p>
 </body>

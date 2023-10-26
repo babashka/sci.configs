@@ -87,15 +87,15 @@
   ratom/*ratom-context*)
 
 (defn -generation
-  [x]
+  [^js x]
   (.-generation x))
 
 (defn -ratom-generation
-  [x]
+  [^js x]
   (.-ratomGeneration x))
 
 (defn -set-ratom-generation!
-  [v c]
+  [^js v ^js c]
   (set! (.-generation v) (.-ratomGeneration c)))
 
 (defn -destroy!

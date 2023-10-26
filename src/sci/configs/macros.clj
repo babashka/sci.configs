@@ -15,3 +15,4 @@
     `(defn ~(vary-meta name assoc :sci/macro true)
        ~@(when ?doc [?doc])
        ~@(map add-macro-args bodies))))
+
