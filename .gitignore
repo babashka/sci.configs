@@ -9,3 +9,4 @@ www/js/
 .calva/
 .portal/
 .nrepl-port
+.shadow-cljs

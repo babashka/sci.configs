@@ -2,3 +2,4 @@ www/js/
 node_modules/
 package-lock.json
 yarn.lock
+.shadow-cljs

@@ -49,13 +49,16 @@
   [form]
   (extract-syms-without-autogen [form nil]))
 
-(def macroexpand-1* (delay (sci/eval-string* (ctx-store/get-ctx) "macroexpand-1")))
+(def sci-macroexpand-1 (delay (sci/eval-string* (ctx-store/get-ctx) "macroexpand-1")))
+(defn macroexpand-1*
+  ([expr] (macroexpand-1* {} expr))
+  ([_env expr] (@sci-macroexpand-1 expr)))
 
 (defn macroexpand*
   "Expand form if it is a CLJS macro, otherwise just return form."
   [env form]
   (if (seq? form)
-    (let [ex (@macroexpand-1* env form)]
+    (let [ex (macroexpand-1* env form)]
       (if (identical? ex form)
         form
         (macroexpand* env ex)))
@@ -208,7 +211,6 @@
         [(list 'fn params body) args])))
 
   (defn cell* [x env]
-    (prn :celllll :env env)
     (let [[f args] (hoist x env)]
       (to-list `((javelin.core/formula ~f) ~@args)))))
 
@@ -222,12 +224,9 @@
 
 (defmacro cell=
   ([expr]
-   (prn :yolo :expr expr)
-   (let [ref (cell* expr &env)]
-     (prn :ref ref)
-     ref))
+   (cell* expr &env))
   ([expr f]
-   `(with-let [c# (cell= ~expr)]
+   `(javelin.core/with-let [c# (javelin.core/cell= ~expr)]
       (set! (.-update c#) ~f))))
 
 (defmacro set-cell!=
@@ -414,11 +413,14 @@
          'with-let (sci/copy-var with-let jns)
          'cell= (sci/copy-var cell= jns)))
 
+(def config {:namespaces {'javelin.core javelin-core-ns}})
+
 #_
 (do
+  (require '[sci.core :as sci])
   (require '[sci.configs.hoplon.javelin] :reload)
   (def ctx (sci/init {:namespaces {'javelin.core sci.configs.hoplon.javelin/javelin-core-ns} :classes {'js js/globalThis :allow :all}}))
   (do (sci.ctx-store/reset-ctx! ctx) nil)
   (sci/eval-string* ctx "(require '[javelin.core :as j])")
-  (sci/eval-string* ctx "(let [a (j/cell 0) b (j/cell= (inc a)) c (j/cell= (js/console.log b))] #_(swap! a inc))")
+  (sci/eval-string* ctx "(let [a (j/cell 0) b (j/cell= (inc a)) c (j/cell= (js/console.log b))] (swap! a inc))")
   )

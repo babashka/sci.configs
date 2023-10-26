@@ -1,42 +1,43 @@
 (ns playground
   "Build CodeMirror editor with SCI evaluation for the SCI Playground."
   (:require
-   [sci.core :as sci]
-   [clojure.string :as str]
-
-   ;; All the configs
-   sci.configs.applied-science.js-interop
-   sci.configs.cljs.pprint
-   sci.configs.cljs.test
-   ;sci.configs.clojure.test
-   sci.configs.fulcro.fulcro
-   sci.configs.funcool.promesa
-   sci.configs.mfikes.cljs-bean
-   sci.configs.re-frame.re-frame
-   sci.configs.reagent.reagent
-   sci.configs.reagent.reagent-dom-server
-   sci.configs.tonsky.datascript
-   ; sci.configs.clojure-1-11
-   
    ;; Code editor
    ;; Inspiration: https://github.com/nextjournal/clojure-mode/blob/main/demo/src/nextjournal/clojure_mode/demo.cljs
    ["@codemirror/commands" :refer [history historyKeymap]]
    ["@codemirror/language" :refer [#_foldGutter
                                    syntaxHighlighting
                                    defaultHighlightStyle]]
+
    ["@codemirror/state" :refer [EditorState]]
    ["@codemirror/view" :as view :refer [EditorView lineNumbers showPanel]]
-
-  
    ;; JS deps for re-export to sci
    ["react" :as react]
    ["react-dom" :as react-dom]
-
+   [clojure.string :as str]
    [nextjournal.clojure-mode :as cm-clj]
-
    ;; Used libs
    [promesa.core :as p]
-   ))
+   ;; All the configs
+   sci.configs.applied-science.js-interop
+   sci.configs.cljs.pprint
+   sci.configs.cljs.test
+   ; sci.configs.clojure-1-11
+
+   ;sci.configs.clojure.test
+   sci.configs.fulcro.fulcro
+   sci.configs.funcool.promesa
+   sci.configs.mfikes.cljs-bean
+   sci.configs.re-frame.re-frame
+
+
+   sci.configs.reagent.reagent
+   sci.configs.reagent.reagent-dom-server
+
+   sci.configs.tonsky.datascript
+   sci.configs.hoplon.javelin
+
+   [sci.core :as sci]
+   [sci.ctx-store :as store]))
 
 ;; Necessary to avoid the error 'Attempting to call unbound fn: #'clojure.core/*print-fn*'
 ;; when calling `println` inside the evaluated code
@@ -57,7 +58,8 @@
    #'sci.configs.re-frame.re-frame/config
    #'sci.configs.reagent.reagent/config
    #'sci.configs.reagent.reagent-dom-server/config
-   #'sci.configs.tonsky.datascript/config])
+   #'sci.configs.tonsky.datascript/config
+   #'sci.configs.hoplon.javelin/config])
 
 (def sci-ctx
   (->> all-configs
@@ -70,6 +72,8 @@
        ;; in .cljc, take the :cljs branch; here b/c of the bug babashka/sci#906
        (#(assoc % :features #{:cljs}))))
 
+(store/reset-ctx! sci-ctx)
+
 (defn eval-code
   ([code]
    (try (sci/eval-string* sci-ctx code)
@@ -79,7 +83,7 @@
                (catch :default _))
           {::error (str (.-message e)) :data (ex-data e)}))))
 
-(defn eval-all [on-result  x]
+(defn eval-all [on-result x]
   (on-result (some->> (.-doc (.-state x)) str eval-code))
   true)
 
@@ -169,9 +173,9 @@
   (p/let [resp (js/fetch (str "https://api.github.com/gists/" gist-id)
                          {:headers {"Accept" "application/vnd.github+json"
                                     "X-GitHub-Api-Version" "2022-11-28"}})
-          _ (when-not (.-ok resp) (throw (ex-info (str "Bad HTTP status " 
-                                                       (.-status resp) " " 
-                                                       (.-statusText resp)) 
+          _ (when-not (.-ok resp) (throw (ex-info (str "Bad HTTP status "
+                                                       (.-status resp) " "
+                                                       (.-statusText resp))
                                                   {})))
           json (.json resp)
           code (gist-json->code json)]
