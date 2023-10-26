@@ -208,8 +208,9 @@
         [(list 'fn params body) args])))
 
   (defn cell* [x env]
+    (prn :celllll :env env)
     (let [[f args] (hoist x env)]
-      (to-list `((formula ~f) ~@args)))))
+      (to-list `((javelin.core/formula ~f) ~@args)))))
 
 ;; javelin CLJS macros ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -220,188 +221,204 @@
   `(let [~binding ~resource] ~@body ~binding))
 
 (defmacro cell=
-  ([expr] (cell* expr &env))
+  ([expr]
+   (prn :yolo :expr expr)
+   (let [ref (cell* expr &env)]
+     (prn :ref ref)
+     ref))
   ([expr f]
    `(with-let [c# (cell= ~expr)]
       (set! (.-update c#) ~f))))
 
-;; (defmacro set-cell!=
-;;   ([c expr]
-;;    `(set-cell!= ~c ~expr nil))
-;;   ([c expr updatefn]
-;;    (let [[f args] (hoist expr &env)]
-;;      `(set-formula! ~c ~f [~@args] ~updatefn))))
+(defmacro set-cell!=
+  ([c expr]
+   `(set-cell!= ~c ~expr nil))
+  ([c expr updatefn]
+   (let [[f args] (hoist expr &env)]
+     `(set-formula! ~c ~f [~@args] ~updatefn))))
 
-;; (defmacro defc
-;;   ([sym expr] `(def ~sym (cell ~expr)))
-;;   ([sym doc expr] `(def ~sym ~doc (cell ~expr))))
+(defmacro defc
+  ([sym expr] `(def ~sym (cell ~expr)))
+  ([sym doc expr] `(def ~sym ~doc (cell ~expr))))
 
-;; (defmacro defc=
-;;   ([sym expr] `(def ~sym (cell= ~expr)))
-;;   ([sym doc & [expr f]]
-;;    (let [doc? (string? doc)
-;;          f    (when-let [f' (if doc? f expr)] [f'])
-;;          expr (if doc? expr doc)
-;;          doc  (when doc? [doc])]
-;;      `(def ~sym ~@doc (cell= ~expr ~@f)))))
+(defmacro defc=
+  ([sym expr] `(def ~sym (cell= ~expr)))
+  ([sym doc & [expr f]]
+   (let [doc? (string? doc)
+         f    (when-let [f' (if doc? f expr)] [f'])
+         expr (if doc? expr doc)
+         doc  (when doc? [doc])]
+     `(def ~sym ~@doc (cell= ~expr ~@f)))))
 
-;; (defmacro formula-of
-;;   "ALPHA: this macro may change.
+(defmacro formula-of
+  "ALPHA: this macro may change.
 
-;;   Given a vector of dependencies and one or more body expressions, emits a
-;;   form that will produce a formula cell. The dependencies must be names that
-;;   will be re-bound to their values within the body. No code walking is done.
-;;   The value of the formula cell is computed by evaluating the body expressions
-;;   whenever any of the dependencies change.
+  Given a vector of dependencies and one or more body expressions, emits a
+  form that will produce a formula cell. The dependencies must be names that
+  will be re-bound to their values within the body. No code walking is done.
+  The value of the formula cell is computed by evaluating the body expressions
+  whenever any of the dependencies change.
 
-;;   Note: the dependencies need not be cells.
+  Note: the dependencies need not be cells.
 
-;;   E.g.
-;;       (def x 100)
-;;       (def y (cell 200))
-;;       (def z (cell= (inc y)))
+  E.g.
+      (def x 100)
+      (def y (cell 200))
+      (def z (cell= (inc y)))
 
-;;       (def c (formula-of [x y z] (+ x y z)))
+      (def c (formula-of [x y z] (+ x y z)))
 
-;;       (deref c) ;=> 501
+      (deref c) ;=> 501
 
-;;       (swap! y inc)
-;;       (deref c) ;=> 503
-;;   "
-;;   [deps & body]
-;;   (assert (and (vector? deps) (every? symbol? deps))
-;;           "first argument must be a vector of symbols")
-;;   `((formula (fn [~@deps] ~@body)) ~@deps))
+      (swap! y inc)
+      (deref c) ;=> 503
+  "
+  [deps & body]
+  (assert (and (vector? deps) (every? symbol? deps))
+          "first argument must be a vector of symbols")
+  `((formula (fn [~@deps] ~@body)) ~@deps))
 
-;; (defmacro formulet
-;;   "ALPHA: this macro may change.
+(defmacro formulet
+  "ALPHA: this macro may change.
 
-;;   Given a vector of binding-form/dependency pairs and one or more body
-;;   expressions, emits a form that will produce a formula cell. Each binding
-;;   form is bound to the value of the corresponding dependency within the body.
-;;   No code walking is done. The value of the formula cell is computed by
-;;   evaluating the body expressions whenever any of the dependencies change.
+  Given a vector of binding-form/dependency pairs and one or more body
+  expressions, emits a form that will produce a formula cell. Each binding
+  form is bound to the value of the corresponding dependency within the body.
+  No code walking is done. The value of the formula cell is computed by
+  evaluating the body expressions whenever any of the dependencies change.
 
-;;   Note: the depdendency expressions are evaluated only once, when the formula
-;;   cell is created, and they need not evaluate to javelin cells.
+  Note: the depdendency expressions are evaluated only once, when the formula
+  cell is created, and they need not evaluate to javelin cells.
 
-;;   E.g.
-;;       (def a (cell 42))
-;;       (def b (cell {:x 100 :y 200}))
+  E.g.
+      (def a (cell 42))
+      (def b (cell {:x 100 :y 200}))
 
-;;       (def c (formulet [v (cell= (inc a))
-;;                         w (+ 1 2)
-;;                         {:keys [x y]} b]
-;;                 (+ v w x y)))
+      (def c (formulet [v (cell= (inc a))
+                        w (+ 1 2)
+                        {:keys [x y]} b]
+                (+ v w x y)))
 
-;;       (deref c) ;=> 346
+      (deref c) ;=> 346
 
-;;       (swap! a inc)
-;;       (deref c) ;=> 347
-;;   "
-;;   [bindings & body]
-;;   (assert (and (vector? bindings) (even? (count bindings)))
-;;           "first argument must be a vector of binding pairs")
-;;   (let [binding-pairs (partition 2 bindings)]
-;;     `((formula (fn [~@(map first binding-pairs)] ~@body))
-;;       ~@(map second binding-pairs))))
+      (swap! a inc)
+      (deref c) ;=> 347
+  "
+  [bindings & body]
+  (assert (and (vector? bindings) (even? (count bindings)))
+          "first argument must be a vector of binding pairs")
+  (let [binding-pairs (partition 2 bindings)]
+    `((formula (fn [~@(map first binding-pairs)] ~@body))
+      ~@(map second binding-pairs))))
 
-;; (defmacro ^:private cell-let-1 [[bindings c] & body]
-;;   (let [syms  (bind-syms bindings)
-;;         dcell `((formula (fn [~bindings] [~@syms])) ~c)]
-;;     `(let [[~@syms] (cell-map identity ~dcell)] ~@body)))
+(defmacro ^:private cell-let-1 [[bindings c] & body]
+  (let [syms  (bind-syms bindings)
+        dcell `((formula (fn [~bindings] [~@syms])) ~c)]
+    `(let [[~@syms] (cell-map identity ~dcell)] ~@body)))
 
-;; (defmacro cell-let
-;;   [[bindings c & more] & body]
-;;   (if-not (seq more)
-;;     `(cell-let-1 [~bindings ~c] ~@body)
-;;     `(cell-let-1 [~bindings ~c]
-;;                  (cell-let ~(vec more) ~@body))))
+(defmacro cell-let
+  [[bindings c & more] & body]
+  (if-not (seq more)
+    `(cell-let-1 [~bindings ~c] ~@body)
+    `(cell-let-1 [~bindings ~c]
+                 (cell-let ~(vec more) ~@body))))
 
-;; (defmacro dosync
-;;   "Evaluates the body within a Javelin transaction. Propagation of updates
-;;   to formula cells is deferred until the transaction is complete. Input
-;;   cells *will* update during the transaction. Transactions may be nested."
-;;   [& body]
-;;   `(dosync* (fn [] ~@body)))
+(defmacro dosync
+  "Evaluates the body within a Javelin transaction. Propagation of updates
+  to formula cells is deferred until the transaction is complete. Input
+  cells *will* update during the transaction. Transactions may be nested."
+  [& body]
+  `(dosync* (fn [] ~@body)))
 
-;; (defmacro cell-doseq
-;;   "Takes a vector of binding-form/collection-cell pairs and one or more body
-;;   expressions, similar to clojure.core/doseq. Iterating over the collection
-;;   cells produces a sequence of items that may grow, shrink, or update over
-;;   time. Whenever this sequence grows the body expressions are evaluated (for
-;;   side effects) exactly once for each new location in the sequence. Bindings
-;;   are bound to cells that refer to the item at that location.
+(defmacro cell-doseq
+  "Takes a vector of binding-form/collection-cell pairs and one or more body
+  expressions, similar to clojure.core/doseq. Iterating over the collection
+  cells produces a sequence of items that may grow, shrink, or update over
+  time. Whenever this sequence grows the body expressions are evaluated (for
+  side effects) exactly once for each new location in the sequence. Bindings
+  are bound to cells that refer to the item at that location.
 
-;;   Consider:
+  Consider:
 
-;;       (def things (cell [{:x :a} {:x :b} {:x :c}]))
+      (def things (cell [{:x :a} {:x :b} {:x :c}]))
 
-;;       (cell-doseq [{:keys [x]} things]
-;;         (prn :creating @x)
-;;         (add-watch x nil #(prn :updating %3 %4)))
+      (cell-doseq [{:keys [x]} things]
+        (prn :creating @x)
+        (add-watch x nil #(prn :updating %3 %4)))
 
-;;       ;; the following is printed -- note that x is a cell:
+      ;; the following is printed -- note that x is a cell:
 
-;;       :creating :a
-;;       :creating :b
-;;       :creating :c
+      :creating :a
+      :creating :b
+      :creating :c
 
-;;   Shrink things by removing the last item:
+  Shrink things by removing the last item:
 
-;;       (swap! things pop)
+      (swap! things pop)
 
-;;       ;; the following is printed (because the 3rd item in things is now nil,
-;;       ;; since things only contains 2 items) -- note that the doit function is
-;;       ;; not called (or we would see a :creating message):
+      ;; the following is printed (because the 3rd item in things is now nil,
+      ;; since things only contains 2 items) -- note that the doit function is
+      ;; not called (or we would see a :creating message):
 
-;;       :updating :c nil
+      :updating :c nil
 
-;;   Grow things such that it is one item larger than it ever was:
+  Grow things such that it is one item larger than it ever was:
 
-;;       (swap! things into [{:x :u} {:x :v}])
+      (swap! things into [{:x :u} {:x :v}])
 
-;;       ;; the following is printed (because things now has 4 items, so the 3rd
-;;       ;; item is now {:x :u} and the max size increases by one with the new
-;;       ;; item {:x :v}):
+      ;; the following is printed (because things now has 4 items, so the 3rd
+      ;; item is now {:x :u} and the max size increases by one with the new
+      ;; item {:x :v}):
 
-;;       :updating nil :u
-;;       :creating :v
+      :updating nil :u
+      :creating :v
 
-;;   A weird imagination is most useful to gain full advantage of all the features."
-;;   [bindings & body]
-;;   (if (= 2 (count bindings))
-;;     `(cell-doseq*
-;;        ((formula seq) ~(second bindings))
-;;        (fn [item#] (cell-let [~(first bindings) item#] ~@body)))
-;;     (let [pairs   (partition 2 bindings)
-;;           lets    (->> pairs (filter (comp (partial = :let) first)) (mapcat second))
-;;           binds*  (->> pairs (take-while (complement (comp keyword? first))))
-;;           mods*   (->> pairs (drop-while (complement (comp keyword? first))) (mapcat identity))
-;;           syms    (->> binds* (mapcat (comp bind-syms first)))
-;;           exprs   (->> binds* (map second))
-;;           gens    (take (count exprs) (repeatedly gensym))
-;;           fors    (-> (->> binds* (map first)) (interleave gens) (concat mods*))]
-;;       `(cell-doseq*
-;;          ((formula (fn [~@gens] (for [~@fors] [~@syms]))) ~@exprs)
-;;          (fn [item#] (cell-let [[~@syms] item#, ~@lets] ~@body))))))
+  A weird imagination is most useful to gain full advantage of all the features."
+  [bindings & body]
+  (if (= 2 (count bindings))
+    `(cell-doseq*
+       ((formula seq) ~(second bindings))
+       (fn [item#] (cell-let [~(first bindings) item#] ~@body)))
+    (let [pairs   (partition 2 bindings)
+          lets    (->> pairs (filter (comp (partial = :let) first)) (mapcat second))
+          binds*  (->> pairs (take-while (complement (comp keyword? first))))
+          mods*   (->> pairs (drop-while (complement (comp keyword? first))) (mapcat identity))
+          syms    (->> binds* (mapcat (comp bind-syms first)))
+          exprs   (->> binds* (map second))
+          gens    (take (count exprs) (repeatedly gensym))
+          fors    (-> (->> binds* (map first)) (interleave gens) (concat mods*))]
+      `(cell-doseq*
+         ((formula (fn [~@gens] (for [~@fors] [~@syms]))) ~@exprs)
+         (fn [item#] (cell-let [[~@syms] item#, ~@lets] ~@body))))))
 
-;; ;; FIXME: this macro doesn't work correctly, maybe mutation observers?
-;; (defmacro prop-cell
-;;   ([prop]
-;;    `(let [ret# (cell ~prop)]
-;;       (js/setInterval #(reset! ret# ~prop) 100)
-;;       (cell= ret#)))
-;;   ([prop setter & [callback]]
-;;    `(let [setter#   ~setter
-;;           callback# (or ~callback identity)]
-;;       (cell= (set! ~prop setter#))
-;;       (js/setInterval
-;;         #(when (not= @setter# ~prop)
-;;            (callback# ~prop)
-;;            (set! ~prop @setter#))
-;;         100)
-;;       setter#)))
+;; FIXME: this macro doesn't work correctly, maybe mutation observers?
+(defmacro prop-cell
+  ([prop]
+   `(let [ret# (cell ~prop)]
+      (js/setInterval #(reset! ret# ~prop) 100)
+      (cell= ret#)))
+  ([prop setter & [callback]]
+   `(let [setter#   ~setter
+          callback# (or ~callback identity)]
+      (cell= (set! ~prop setter#))
+      (js/setInterval
+        #(when (not= @setter# ~prop)
+           (callback# ~prop)
+           (set! ~prop @setter#))
+        100)
+      setter#)))
 
-;; (def javelin-core-ns
-;;   (prn (sci/copy-ns javelin.core jns)))
+(def javelin-core-ns
+  (assoc (sci/copy-ns javelin.core jns)
+         'dosync (sci/copy-var dosync jns)
+         'with-let (sci/copy-var with-let jns)
+         'cell= (sci/copy-var cell= jns)))
+
+#_
+(do
+  (require '[sci.configs.hoplon.javelin] :reload)
+  (def ctx (sci/init {:namespaces {'javelin.core sci.configs.hoplon.javelin/javelin-core-ns} :classes {'js js/globalThis :allow :all}}))
+  (do (sci.ctx-store/reset-ctx! ctx) nil)
+  (sci/eval-string* ctx "(require '[javelin.core :as j])")
+  (sci/eval-string* ctx "(let [a (j/cell 0) b (j/cell= (inc a)) c (j/cell= (js/console.log b))] #_(swap! a inc))")
+  )
