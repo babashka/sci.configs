@@ -1,6 +1,6 @@
 {:deps
  {org.babashka/sci {:git/url "https://github.com/babashka/sci"
-                    :git/sha "0f24b4b73d68a5c5a0df6e984377764dbd076dd5"}
+                    :git/sha "853f25da8c3c9ec3641b13175e25d74b31119e59"}
   org.clojure/clojurescript {:mvn/version "1.11.51"}
   applied-science/js-interop {:mvn/version "0.3.3"}
   com.fulcrologic/fulcro {:mvn/version "3.6.10"}

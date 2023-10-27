@@ -7,7 +7,7 @@
             [cljs.pprint :as p]
             [clojure.string :as str]
             [javelin.core])
-  (:require-macros [sci.configs.macros :as m :refer [defmacro]]
+  (:require-macros [sci.configs.macros :as m]
                    [sci.configs.hoplon.javelin :refer [with-let*]]))
 
 (def Exception js/Error)
