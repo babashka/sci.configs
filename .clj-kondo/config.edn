@@ -1,0 +1,1 @@
+{:lint-as {sci.configs.macros/defmacro clojure.core/defmacro}}

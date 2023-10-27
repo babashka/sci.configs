@@ -1,6 +1,4 @@
-.clj-kondo
 .cache
-.lsp
 .DS_Store
 .cpcache
 cljs-test-runner-out
