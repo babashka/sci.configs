@@ -151,6 +151,7 @@
       :else    (span \"Default\"))
   "
   [& clauses]
+  (assert (even? (count clauses)))
   (let [[conds tpls] (apply map vector (partition 2 clauses))
         syms1        (repeatedly (count conds) gensym)
         syms2        (repeatedly (count conds) gensym)]
