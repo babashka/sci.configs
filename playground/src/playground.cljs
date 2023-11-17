@@ -36,7 +36,7 @@
    sci.configs.tonsky.datascript
    sci.configs.hoplon.javelin
    sci.configs.hoplon.hoplon
-   hoplon.goog
+   hoplon.dom
 
    [sci.core :as sci]
    [sci.ctx-store :as store]))
