@@ -231,23 +231,23 @@
 
 (m/defmacro set-cell!=
   ([c expr]
-   `(set-cell!= ~c ~expr nil))
+   `(javelin.core/set-cell!= ~c ~expr nil))
   ([c expr updatefn]
    (let [[f args] (hoist expr &env)]
-     `(set-formula! ~c ~f [~@args] ~updatefn))))
+     `(javelin.core/set-formula! ~c ~f [~@args] ~updatefn))))
 
 (m/defmacro defc
-  ([sym expr] `(def ~sym (cell ~expr)))
-  ([sym doc expr] `(def ~sym ~doc (cell ~expr))))
+  ([sym expr] `(def ~sym (javelin.core/cell ~expr)))
+  ([sym doc expr] `(def ~sym ~doc (javelin.core/cell ~expr))))
 
 (m/defmacro defc=
-  ([sym expr] `(def ~sym (cell= ~expr)))
+  ([sym expr] `(def ~sym (javelin.core/cell= ~expr)))
   ([sym doc & [expr f]]
    (let [doc? (string? doc)
          f    (when-let [f' (if doc? f expr)] [f'])
          expr (if doc? expr doc)
          doc  (when doc? [doc])]
-     `(def ~sym ~@doc (cell= ~expr ~@f)))))
+     `(def ~sym ~@doc (javelin.core/cell= ~expr ~@f)))))
 
 (m/defmacro formula-of
   "ALPHA: this macro may change.
@@ -275,7 +275,7 @@
   [deps & body]
   (assert (and (vector? deps) (every? symbol? deps))
           "first argument must be a vector of symbols")
-  `((formula (fn [~@deps] ~@body)) ~@deps))
+  `((javelin.core/formula (fn [~@deps] ~@body)) ~@deps))
 
 (m/defmacro formulet
   "ALPHA: this macro may change.
@@ -307,13 +307,13 @@
   (assert (and (vector? bindings) (even? (count bindings)))
           "first argument must be a vector of binding pairs")
   (let [binding-pairs (partition 2 bindings)]
-    `((formula (fn [~@(map first binding-pairs)] ~@body))
+    `((javelin.core/formula (fn [~@(map first binding-pairs)] ~@body))
       ~@(map second binding-pairs))))
 
 (m/defmacro ^:private cell-let-1 [[bindings c] & body]
   (let [syms  (bind-syms bindings)
-        dcell `((formula (fn [~bindings] [~@syms])) ~c)]
-    `(let [[~@syms] (cell-map identity ~dcell)] ~@body)))
+        dcell `((javelin.core/formula (fn [~bindings] [~@syms])) ~c)]
+    `(let [[~@syms] (javelin.core/cell-map identity ~dcell)] ~@body)))
 
 (m/defmacro cell-let
   [[bindings c & more] & body]
@@ -375,8 +375,8 @@
   A weird imagination is most useful to gain full advantage of all the features."
   [bindings & body]
   (if (= 2 (count bindings))
-    `(cell-doseq*
-       ((formula seq) ~(second bindings))
+    `(javelin.core/cell-doseq*
+       ((javelin.core/formula seq) ~(second bindings))
        (fn [item#] (javelin.core/cell-let [~(first bindings) item#] ~@body)))
     (let [pairs   (partition 2 bindings)
           lets    (->> pairs (filter (comp (partial = :let) first)) (mapcat second))
@@ -386,8 +386,8 @@
           exprs   (->> binds* (map second))
           gens    (take (count exprs) (repeatedly gensym))
           fors    (-> (->> binds* (map first)) (interleave gens) (concat mods*))]
-      `(cell-doseq*
-         ((formula (fn [~@gens] (for [~@fors] [~@syms]))) ~@exprs)
+      `(javelin.core/cell-doseq*
+         ((javelin.core/formula (fn [~@gens] (for [~@fors] [~@syms]))) ~@exprs)
          (fn [item#] (javelin.core/cell-let [[~@syms] item#, ~@lets] ~@body))))))
 
 ;; FIXME: this macro doesn't work correctly, maybe mutation observers?
@@ -395,11 +395,11 @@
   ([prop]
    `(let [ret# (cell ~prop)]
       (js/setInterval #(reset! ret# ~prop) 100)
-      (cell= ret#)))
+      (javelin.core/cell= ret#)))
   ([prop setter & [callback]]
    `(let [setter#   ~setter
           callback# (or ~callback identity)]
-      (cell= (set! ~prop setter#))
+      (javelin.core/cell= (set! ~prop setter#))
       (js/setInterval
         #(when (not= @setter# ~prop)
            (callback# ~prop)
@@ -407,15 +407,20 @@
         100)
       setter#)))
 
-(prn :dosync dosync)
-
 (def javelin-core-ns
   (assoc (sci/copy-ns javelin.core jns)
          'foo 'bar
          'dosync (sci/copy-var sci.configs.hoplon.javelin/dosync jns)
          'with-let (sci/copy-var sci.configs.hoplon.javelin/with-let jns)
          'cell= (sci/copy-var cell= jns)
-         ))
+         'defc (sci/copy-var defc jns)
+         'cell-let-1 (sci/copy-var cell-let-1 jns)
+         'cell-let (sci/copy-var cell-let jns)
+         'defc= (sci/copy-var defc= jns)
+         'set-cell!= (sci/copy-var set-cell!= jns)
+         'formula-of (sci/copy-var formula-of jns)
+         'formulet (sci/copy-var formulet jns)
+         'cell-doseq (sci/copy-var cell-doseq jns)))
 
 (def config {:namespaces {'javelin.core javelin-core-ns}})
 
