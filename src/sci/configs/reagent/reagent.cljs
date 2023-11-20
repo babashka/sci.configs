@@ -100,11 +100,11 @@
   (set! (.-generation v) (.-ratomGeneration c)))
 
 (defn -destroy!
-  [v destroy]
+  [^js v destroy]
   (set! (.-destroy v) destroy))
 
 (defn -destroy
-  [v]
+  [^js v]
   (.-destroy v))
 
 (def reagent-ratom-namespace
