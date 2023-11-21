@@ -100,6 +100,7 @@ Public API:
 - `config`
 - `re-frame-namespace`
 - `re-frame-db-namespace`
+- `re-frame-alpha-namespace`
 - `namespaces`
 
 ### [mfikes/cljs-bean](https://github.com/mfikes/cljs-bean)
