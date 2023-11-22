@@ -102,6 +102,16 @@ Public API:
 - `re-frame-db-namespace`
 - `namespaces`
 
+The configuration for `re-frame.alpha` is available seperately via:
+
+Namespace: `sci.configs.re-frame.re-frame-alpha`
+
+Public API:
+
+- `config`
+- `re-frame-alpha-namespace`
+
+
 ### [mfikes/cljs-bean](https://github.com/mfikes/cljs-bean)
 
 Namespace: `sci.configs.mfikes.cljs-bean`
