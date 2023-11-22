@@ -28,7 +28,7 @@
    sci.configs.funcool.promesa
    sci.configs.mfikes.cljs-bean
    sci.configs.re-frame.re-frame
-
+   sci.configs.re-frame.re-frame-alpha
 
    sci.configs.reagent.reagent
    sci.configs.reagent.reagent-dom-server
@@ -58,6 +58,7 @@
    #'sci.configs.funcool.promesa/config
    #'sci.configs.mfikes.cljs-bean/config
    #'sci.configs.re-frame.re-frame/config
+   #'sci.configs.re-frame.re-frame-alpha/config
    #'sci.configs.reagent.reagent/config
    #'sci.configs.reagent.reagent-dom-server/config
    #'sci.configs.tonsky.datascript/config
