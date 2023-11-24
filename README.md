@@ -82,9 +82,16 @@ Public API:
 - `reagent-debug-namespace`
 - `namespaces`
 
-The configuration for `reagent.dom.server` is available seperately via:
+Configurations for `reagent.dom.server` and `reagent.dom.client` are available seperately via:
 
 Namespace: `sci.configs.reagent.reagent-dom-server`
+
+Public API:
+
+- `config`
+- `reagent-dom-server-namespace`
+
+Namespace: `sci.configs.reagent.reagent-dom-client`
 
 Public API:
 
