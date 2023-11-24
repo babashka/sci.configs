@@ -1,5 +1,5 @@
 (ns sci.configs.reagent.reagent-dom-client
-  (:require [reagent.dom.client :as srv]
+  (:require [reagent.dom.client :as rdc]
             [sci.core :as sci]))
 
 (def rdcns (sci/create-ns 'reagent.dom.client nil))
