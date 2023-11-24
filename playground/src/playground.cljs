@@ -32,6 +32,7 @@
 
    sci.configs.reagent.reagent
    sci.configs.reagent.reagent-dom-server
+   sci.configs.reagent.reagent-dom-client
 
    sci.configs.tonsky.datascript
    sci.configs.hoplon.javelin
@@ -61,6 +62,7 @@
    #'sci.configs.re-frame.re-frame-alpha/config
    #'sci.configs.reagent.reagent/config
    #'sci.configs.reagent.reagent-dom-server/config
+   #'sci.configs.reagent.reagent-dom-client/config
    #'sci.configs.tonsky.datascript/config
    #'sci.configs.hoplon.javelin/config
    #'sci.configs.hoplon.hoplon/config])
