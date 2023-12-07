@@ -10,5 +10,6 @@
   re-frame/re-frame {:mvn/version "1.4.0"}
   hoplon/javelin {:mvn/version "3.9.3"}
   hoplon/hoplon {:mvn/version "7.5.0"}
-  datascript/datascript {:mvn/version "1.5.3"}
+  logseq/datascript {:git/url "https://github.com/logseq/datascript"
+                     :git/sha "51fe8d3fc95056bb82553b3803e5994d194206b4"}
   cljs-bean/cljs-bean {:mvn/version "1.9.0"}}}
