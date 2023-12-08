@@ -2,6 +2,7 @@
   (:require [datascript.core :as d]
             [datascript.db :as db]
             [datascript.storage :as storage]
+            [sci.impl.types :as types]
             [sci.core :as sci :refer [copy-var]]))
 
 (def core-ns (sci/create-ns 'datascript.core nil))
@@ -45,7 +46,41 @@
    'DB                (copy-var db/DB db-ns)
    'Datom             (copy-var db/Datom db-ns)})
 
-(def storage-namespace (sci/copy-ns datascript.storage storage-ns))
+;;;; IDeref
+
+(defmulti -store types/type-impl)
+(defmulti -restore types/type-impl)
+
+(defmethod -store :sci.impl.protocols/reified [store addr+data-seq]
+  (let [methods (types/getMethods store)]
+    ((get methods -store) store addr+data-seq)))
+
+(def store-default
+  (defmethod -store :default [store addr+data-seq]
+    (storage/-store store addr+data-seq)))
+
+(defmethod -restore :sci.impl.protocols/reified [store addr]
+  (let [methods (types/getMethods store)]
+    ((get methods -restore) store addr)))
+
+(def restore-default
+  (defmethod -restore :default [store addr+data-seq]
+    (storage/-restore store addr+data-seq)))
+
+(def IStorage-protocol
+  (sci/new-var
+   'datascript.storage.IStorage
+   {:protocol datascript.storage.IStorage
+    :methods #{-store -restore}
+    :ns storage-ns}))
+
+;;;; end IDeref
+
+
+(def storage-namespace (assoc (sci/copy-ns datascript.storage storage-ns)
+                              '-store (sci/copy-var -store storage-ns)
+                              '-restore (sci/copy-var -restore storage-ns)
+                              'IStorage IStorage-protocol))
 
 (def namespaces {'datascript.core core-namespace
                  'datascript.db   db-namespace
