@@ -55,17 +55,25 @@
   (let [methods (types/getMethods store)]
     ((get methods -store) store addr+data-seq)))
 
+(def old-store storage/-store)
+
 (def store-default
   (defmethod -store :default [store addr+data-seq]
-    (storage/-store store addr+data-seq)))
+    (old-store store addr+data-seq)))
+
+(set! storage/-store (fn [store addr] (-store store addr))) ;; DANGER, PATCH!
 
 (defmethod -restore :sci.impl.protocols/reified [store addr]
   (let [methods (types/getMethods store)]
     ((get methods -restore) store addr)))
 
+(def old-restore storage/-restore)
+
 (def restore-default
   (defmethod -restore :default [store addr+data-seq]
-    (storage/-restore store addr+data-seq)))
+    (old-restore store addr+data-seq)))
+
+(set! storage/-restore (fn [store addr] (-restore store addr))) ;; DANGER, PATCH!
 
 (def IStorage-protocol
   (sci/new-var
@@ -80,7 +88,8 @@
 (def storage-namespace (assoc (sci/copy-ns datascript.storage storage-ns)
                               '-store (sci/copy-var -store storage-ns)
                               '-restore (sci/copy-var -restore storage-ns)
-                              'IStorage IStorage-protocol))
+                              'IStorage IStorage-protocol
+                              ))
 
 (def namespaces {'datascript.core core-namespace
                  'datascript.db   db-namespace
