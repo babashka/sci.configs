@@ -193,6 +193,7 @@
    'pending? (sci/copy-var p/pending? pns)
    'promise (sci/copy-var p/promise pns)
    'promise? (sci/copy-var p/promise? pns)
+   'promisify (sci/copy-var p/promisify pns)
    'race (sci/copy-var p/race pns)
    'recur (sci/copy-var recur pns)
    'reject! (sci/copy-var p/reject! pns)
