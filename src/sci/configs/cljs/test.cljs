@@ -241,7 +241,8 @@
    [sci.impl.io :refer [println]]
    [sci.impl.namespaces :as sci-namespaces]
    [sci.impl.resolve :as resolve]
-   [sci.lang]))
+   [sci.lang]
+   [sci.ctx-store :as ctx-store]))
 
 (defn sci-var? [x]
   (instance? sci.lang.Var x))
@@ -1104,6 +1105,35 @@
 
 (def assert-expr-var (sci/copy-var assert-expr tns))
 
+(defn ^:sci/macro run-test
+  "Runs a single test.
+  Because the intent is to run a single test, there is no check for the namespace test-ns-hook."
+  [_ _ test-symbol]
+  (let [test-var  (sci.core/resolve (ctx-store/get-ctx) test-symbol)]
+    (cond (nil? test-var)
+          `(cljs.core/*print-err-fn* "Unable to resolve" ~(str test-symbol) "to a test function.")
+          (not (:test (meta test-var)))
+          `(cljs.core/*print-err-fn* ~(str test-symbol) "is not a test")
+          :else
+          (let [ns (:ns test-var)]
+            `(let [env# (cljs.test/get-current-env)]
+               (cljs.test/run-block
+                (concat
+                 [(fn []
+                    (when (nil? env#)
+                      (cljs.test/set-env! (cljs.test/empty-env)))
+                    ~(when (sci/resolve (ctx-store/get-ctx) 'cljs-test-once-fixtures)
+                       `(cljs.test/update-current-env! [:once-fixtures] assoc '~ns
+                                                       ~(symbol (str ns) "cljs-test-once-fixtures")))
+                    ~(when (sci/resolve (ctx-store/get-ctx) 'cljs-test-each-fixtures)
+                       `(cljs.test/update-current-env! [:each-fixtures] assoc '~ns
+                                                       ~(symbol (str ns) "cljs-test-each-fixtures"))))]
+                 (cljs.test/test-vars-block
+                  [(var ~test-symbol)])
+                 [(fn []
+                    (when (nil? env#)
+                      (cljs.test/clear-env!)))])))))))
+
 (def cljs-test-namespace
   {:obj tns
    'async (sci/copy-var async tns)
@@ -1144,8 +1174,13 @@
    'test-vars (sci/copy-var test-vars tns)
    'get-current-env (sci/copy-var get-current-env tns)
    'run-tests (sci/copy-var run-tests tns)
+   'run-test (sci/copy-var run-test tns)
+   'run-block (sci/copy-var run-block tns)
    'run-all-tests (sci/copy-var run-all-tests tns)
    'empty-env (sci/copy-var empty-env tns)
+   'set-env! (sci/copy-var set-env! tns)
+   'test-vars-block (sci/copy-var test-vars-block tns)
+   'clear-env! (sci/copy-var clear-env! tns)
    'successful? (sci/copy-var successful? tns)})
 
 (def namespaces {'cljs.test cljs-test-namespace})
