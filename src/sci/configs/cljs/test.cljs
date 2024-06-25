@@ -223,7 +223,7 @@
      :actual     A form representing what actually occurred
      :message    The string message given as an argument to 'is'
 
-   The \"testing\" strings will be a list in \"*testing-contexts*\", and
+   The \"testing\" strings will be a list in \"*current-env*\", and
    the vars being tested will be a list in \"*testing-vars*\".
 
    Your \"report\" function should wrap any printing calls in the
@@ -280,8 +280,6 @@
   (sci/new-dynamic-var '*initial-report-counters* {:test 0, :pass 0, :fail 0, :error 0} {:ns tns}))
 
 (def testing-vars (sci/new-dynamic-var '*testing-vars* (list) {:ns tns}))  ; bound to hierarchy of vars being tested
-
-(def testing-contexts (sci/new-dynamic-var '*testing-contexts* (list) {:ns tns})) ; bound to hierarchy of "testing" strings
 
 ;;; UTILITIES FOR REPORTING FUNCTIONS
 
@@ -712,8 +710,12 @@
   but must occur inside a test function (deftest)."
   {:added "1.1"}
   [_ _ string & body]
-  `(binding [cljs.test/*testing-contexts* (conj cljs.test/*testing-contexts* ~string)]
-     ~@body))
+  `(do
+     (cljs.test/update-current-env! [:testing-contexts] conj ~string)
+     (try
+       ~@body
+       (finally
+         (cljs.test/update-current-env! [:testing-contexts] rest)))))
 
 
 
@@ -1143,7 +1145,6 @@
    '*report-counters* report-counters
    '*initial-report-counters* initial-report-counters
    '*testing-vars* testing-vars
-   '*testing-contexts* testing-contexts
    'testing-vars-str (sci/copy-var testing-vars-str tns)
    'testing-contexts-str (sci/copy-var testing-contexts-str tns)
    'inc-report-counter! (sci/copy-var inc-report-counter! tns)
@@ -1173,6 +1174,7 @@
    'test-var test-var
    'test-vars (sci/copy-var test-vars tns)
    'get-current-env (sci/copy-var get-current-env tns)
+   'update-current-env! (sci/copy-var update-current-env! tns)
    'run-tests (sci/copy-var run-tests tns)
    'run-test (sci/copy-var run-test tns)
    'run-block (sci/copy-var run-block tns)
