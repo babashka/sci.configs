@@ -5,15 +5,18 @@
 (def pns (sci/create-ns 'cljs.pprint nil))
 
 (defn pprint [& args]
-  (binding [*print-fn* @sci/print-fn]
+  (binding [*print-fn* @sci/print-fn
+            *print-newline* @sci/print-newline]
     (apply pp/pprint args)))
 
 (defn print-table [& args]
-  (binding [*print-fn* @sci/print-fn]
+  (binding [*print-fn* @sci/print-fn
+            *print-newline* @sci/print-newline]
     (apply pp/print-table args)))
 
 (defn cl-format [& args]
-  (binding [*print-fn* @sci/print-fn]
+  (binding [*print-fn* @sci/print-fn
+            *print-newline* @sci/print-newline]
     (apply pp/cl-format args)))
 
 (def cljs-pprint-namespace
