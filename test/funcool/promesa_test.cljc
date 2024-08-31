@@ -1,6 +1,6 @@
 (ns funcool.promesa-test
   (:require
-   [cljs.test :refer [async deftest is testing]]
+   [cljs.test :refer [deftest is async]]
    [sci.configs.funcool.promesa :as promesa-config]
    [sci.core :as sci]))
 
