@@ -12,10 +12,10 @@
 (def pns (sci/create-ns 'promesa.core nil))
 (def ptns (sci/create-ns 'promesa.protocols nil))
 
-(defn ^:macro do!
-  "Execute potentially side effectful code and return a promise resolved
-  to the last expression. Always awaiting the result of each
-  expression."
+
+(defn ^:macro do*
+  "An exception unsafe do-like macro. Supposes that we are already
+  wrapped in promise context so avoids defensive wrapping."
   [_ _ & exprs]
   (condp = (count exprs)
     0 `(p/resolved nil)
@@ -24,6 +24,16 @@
               `(p/bind (p/promise ~e) (fn [_#] ~acc)))
             `(p/promise ~(last exprs))
             (reverse (butlast exprs)))))
+
+(defn ^:macro do
+  "Execute potentially side effectful code and return a promise resolved
+  to the last expression after awaiting the result of each
+  expression."
+  [_ _ & exprs]
+  `(p/bind
+    (p/promise nil)
+    (fn [_#]
+      (promesa.core/do* ~@exprs))))
 
 (defn ^:macro let*
   "An exception unsafe let-like macro. Supposes that we are already
@@ -175,9 +185,9 @@
    'create (sci/copy-var p/create pns)
    'deferred (sci/copy-var p/deferred pns)
    'delay (sci/copy-var p/delay pns)
-   'do (sci/copy-var do! pns)
-   'do* (sci/copy-var do! pns)
-   'do! (sci/copy-var do! pns)
+   'do (sci/copy-var do pns)
+   'do* (sci/copy-var do* pns)
+   'do! (sci/copy-var do pns)
    'done? (sci/copy-var p/done? pns)
    'error (sci/copy-var p/error pns)
    'extract (sci/copy-var p/extract pns)
