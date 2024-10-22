@@ -1,10 +1,11 @@
 (ns sci.configs.cljs.spec.alpha
-  (:refer-clojure :exclude [and or keys merge])
+  (:refer-clojure :exclude [and or keys merge every])
   (:require [clojure.spec.alpha :as s]
             [cljs.spec.gen.alpha :as gen]
             [sci.core :as sci]
             [sci.ctx-store :as ctx]
-            [clojure.walk :as walk])
+            [clojure.walk :as walk]
+            [clojure.core :as c])
   (:require-macros [sci.configs.macros :as macros]))
 
 (def sns (sci/create-ns 'cljs.spec.alpha nil))
@@ -200,6 +201,80 @@
   (let [&env (ctx/get-ctx)]
     `(s/merge-spec-impl '~(mapv #(res &env %) pred-forms) ~(vec pred-forms) nil)))
 
+(defn- res-kind
+  [env opts]
+  (let [{kind :kind :as mopts} opts]
+    (->>
+     (if kind
+       (assoc mopts :kind `~(res env kind))
+       mopts)
+     (mapcat identity))))
+
+(macros/defmacro coll-of
+  "Returns a spec for a collection of items satisfying pred. Unlike
+  generator will fill an empty init-coll.
+
+  Same options as 'every'. conform will produce a collection
+  corresponding to :into if supplied, else will match the input collection,
+  avoiding rebuilding when possible.
+
+  Same options as 'every'.
+
+  See also - every, map-of"
+  [pred & opts]
+  (let [&env (ctx/get-ctx)
+        desc `(coll-of ~(res &env pred) ~@(res-kind &env opts))]
+    `(s/every ~pred ::s/conform-all true ::s/describe '~desc ~@opts)))
+
+(macros/defmacro every
+  "takes a pred and validates collection elements against that pred.
+
+  Note that 'every' does not do exhaustive checking, rather it samples
+  *coll-check-limit* elements. Nor (as a result) does it do any
+  conforming of elements. 'explain' will report at most *coll-error-limit*
+  problems.  Thus 'every' should be suitable for potentially large
+  collections.
+
+  Takes several kwargs options that further constrain the collection:
+
+  :kind - a pred that the collection type must satisfy, e.g. vector?
+          (default nil) Note that if :kind is specified and :into is
+          not, this pred must generate in order for every to generate.
+  :count - specifies coll has exactly this count (default nil)
+  :min-count, :max-count - coll has count (<= min-count count max-count) (defaults nil)
+  :distinct - all the elements are distinct (default nil)
+
+  And additional args that control gen
+
+  :gen-max - the maximum coll size to generate (default 20)
+  :into - one of [], (), {}, #{} - the default collection to generate into
+      (default same as :kind if supplied, else []
+
+  Optionally takes :gen generator-fn, which must be a fn of no args that
+  returns a test.check generator
+
+  See also - coll-of, every-kv
+"
+  [pred & {:keys [into kind count max-count min-count distinct gen-max gen-into gen] :as opts}]
+  (let [&env (ctx/get-ctx)
+        desc (::s/describe opts)
+        nopts (-> opts
+                (dissoc :gen ::s/describe)
+                (assoc ::s/kind-form `'~(res &env (:kind opts))
+                       ::s/describe (clojure.core/or desc `'(every ~(res &env pred) ~@(res-kind &env opts)))))
+        gx (gensym)
+        cpreds (cond-> [(list (clojure.core/or kind `coll?) gx)]
+                 count (conj `(= ~count (c/bounded-count ~count ~gx)))
+
+                 (clojure.core/or min-count max-count)
+                 (conj `(<= (c/or ~min-count 0)
+                          (c/bounded-count (if ~max-count (inc ~max-count) ~min-count) ~gx)
+                          (c/or ~max-count MAX_INT)))
+
+                 distinct
+                 (conj `(c/or (empty? ~gx) (apply distinct? ~gx))))]
+    `(s/every-impl '~pred ~pred ~(assoc nopts ::s/cpred `(fn* [~gx] (c/and ~@cpreds))) ~gen)))
+
 (def namespaces {'cljs.spec.alpha {'def (sci/copy-var def* sns)
                                    'def-impl (sci/copy-var s/def-impl sns)
                                    'and (sci/copy-var and sns)
@@ -220,7 +295,12 @@
                                    'amp-impl (sci/copy-var s/amp-impl sns)
                                    'gen (sci/copy-var s/gen sns)
                                    'merge (sci/copy-var merge sns)
-                                   'merge-spec-impl (sci/copy-var s/merge-spec-impl sns)}
+                                   'merge-spec-impl (sci/copy-var s/merge-spec-impl sns)
+                                   'coll-of (sci/copy-var coll-of sns)
+                                   'every (sci/copy-var every sns)
+                                   'every-impl (sci/copy-var s/every-impl sns)}
                  'cljs.spec.gen.alpha {'fmap (sci/copy-var gen/fmap gns)}})
 
 (def config {:namespaces namespaces})
+
+;; TODO: multi-spec
