@@ -275,6 +275,15 @@
                  (conj `(c/or (empty? ~gx) (apply distinct? ~gx))))]
     `(s/every-impl '~pred ~pred ~(assoc nopts ::s/cpred `(fn* [~gx] (c/and ~@cpreds))) ~gen)))
 
+(macros/defmacro tuple
+  "takes one or more preds and returns a spec for a tuple, a vector
+  where each element conforms to the corresponding pred. Each element
+  will be referred to in paths using its ordinal."
+  [& preds]
+  (let [&env (ctx/get-ctx)]
+    (clojure.core/assert (not (empty? preds)))
+    `(s/tuple-impl '~(mapv #(res &env %) preds) ~(vec preds))))
+
 (def namespaces {'cljs.spec.alpha {'def (sci/copy-var def* sns)
                                    'def-impl (sci/copy-var s/def-impl sns)
                                    'and (sci/copy-var and sns)
@@ -298,7 +307,9 @@
                                    'merge-spec-impl (sci/copy-var s/merge-spec-impl sns)
                                    'coll-of (sci/copy-var coll-of sns)
                                    'every (sci/copy-var every sns)
-                                   'every-impl (sci/copy-var s/every-impl sns)}
+                                   'every-impl (sci/copy-var s/every-impl sns)
+                                   'tuple (sci/copy-var tuple sns)
+                                   'tuple-impl (sci/copy-var s/tuple-impl sns)}
                  'cljs.spec.gen.alpha {'fmap (sci/copy-var gen/fmap gns)}})
 
 (def config {:namespaces namespaces})
