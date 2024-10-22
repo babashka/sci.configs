@@ -367,6 +367,26 @@
     (clojure.core/assert (clojure.core/and (even? (count key-pred-forms)) (every? keyword? keys)) "alt expects k1 p1 k2 p2..., where ks are keywords")
     `(s/alt-impl ~keys ~pred-forms '~pf)))
 
+(macros/defmacro spec
+  "Takes a single predicate form, e.g. can be the name of a predicate,
+  like even?, or a fn literal like #(< % 42). Note that it is not
+  generally necessary to wrap predicates in spec when using the rest
+  of the spec macros, only to attach a unique generator
+
+  Can also be passed the result of one of the regex ops -
+  cat, alt, *, +, ?, in which case it will return a regex-conforming
+  spec, useful when nesting an independent regex.
+  ---
+
+  Optionally takes :gen generator-fn, which must be a fn of no args that
+  returns a test.check generator.
+
+  Returns a spec."
+  [form & {:keys [gen]}]
+  (let [&env (ctx/get-ctx)]
+    (when form
+      `(s/spec-impl '~(res &env form) ~form ~gen nil))))
+
 (def namespaces {'cljs.spec.alpha {'def (sci/copy-var def* sns)
                                    'def-impl (sci/copy-var s/def-impl sns)
                                    'and (sci/copy-var and sns)
@@ -405,7 +425,9 @@
                                    'maybe-impl (sci/copy-var s/maybe-impl sns)
                                    'alt (sci/copy-var alt sns)
                                    'alt-impl (sci/copy-var s/alt-impl sns)
-                                   'describe (sci/copy-var s/describe sns)}
+                                   'describe (sci/copy-var s/describe sns)
+                                   'spec (sci/copy-var spec sns)
+                                   'spec-impl (sci/copy-var s/spec-impl sns)}
                  'cljs.spec.gen.alpha {'fmap (sci/copy-var gen/fmap gns)}})
 
 (def config {:namespaces namespaces})
