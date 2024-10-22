@@ -105,6 +105,7 @@
                                    'valid? (sci/copy-var s/valid? sns)
                                    'conform (sci/copy-var s/conform sns)
                                    'nilable (sci/copy-var nilable sns)
-                                   'nilable-impl (sci/copy-var s/nilable-impl sns)}})
+                                   'nilable-impl (sci/copy-var s/nilable-impl sns)
+                                   'explain (sci/copy-var s/explain sns)}})
 
 (def config {:namespaces namespaces})
