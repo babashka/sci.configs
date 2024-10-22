@@ -284,6 +284,33 @@
     (clojure.core/assert (not (empty? preds)))
     `(s/tuple-impl '~(mapv #(res &env %) preds) ~(vec preds))))
 
+(macros/defmacro map-of
+  "Returns a spec for a map whose keys satisfy kpred and vals satisfy
+  vpred. Unlike 'every-kv', map-of will exhaustively conform every
+  value.
+
+  Same options as 'every', :kind defaults to map?, with the addition of:
+
+  :conform-keys - conform keys as well as values (default false)
+
+  See also - every-kv"
+  [kpred vpred & opts]
+  (let [&env (ctx/get-ctx)
+        desc `(map-of ~(res &env kpred) ~(res &env vpred) ~@(res-kind &env opts))]
+    `(s/every-kv ~kpred ~vpred ::s/conform-all true :kind map? ::s/describe '~desc ~@opts)))
+
+(macros/defmacro every-kv
+  "like 'every' but takes separate key and val preds and works on associative collections.
+
+  Same options as 'every', :into defaults to {}
+
+  See also - map-of"
+
+  [kpred vpred & opts]
+  (let [&env (ctx/get-ctx)
+        desc `(every-kv ~(res &env kpred) ~(res &env vpred) ~@(res-kind &env opts))]
+    `(s/every (s/tuple ~kpred ~vpred) ::s/kfn (fn [i# v#] (nth v# 0)) :into {} ::s/describe '~desc ~@opts)))
+
 (def namespaces {'cljs.spec.alpha {'def (sci/copy-var def* sns)
                                    'def-impl (sci/copy-var s/def-impl sns)
                                    'and (sci/copy-var and sns)
@@ -309,7 +336,9 @@
                                    'every (sci/copy-var every sns)
                                    'every-impl (sci/copy-var s/every-impl sns)
                                    'tuple (sci/copy-var tuple sns)
-                                   'tuple-impl (sci/copy-var s/tuple-impl sns)}
+                                   'tuple-impl (sci/copy-var s/tuple-impl sns)
+                                   'map-of (sci/copy-var map-of sns)
+                                   'every-kv (sci/copy-var every-kv sns)}
                  'cljs.spec.gen.alpha {'fmap (sci/copy-var gen/fmap gns)}})
 
 (def config {:namespaces namespaces})
