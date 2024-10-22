@@ -1,5 +1,5 @@
 (ns sci.configs.cljs.spec.alpha
-  (:refer-clojure :exclude [and or keys merge every cat + ? *])
+  (:refer-clojure :exclude [and or keys merge every cat + ? * assert])
   (:require [clojure.spec.alpha :as s]
             [cljs.spec.gen.alpha :as gen]
             [sci.core :as sci]
@@ -387,6 +387,28 @@
     (when form
       `(s/spec-impl '~(res &env form) ~form ~gen nil))))
 
+(macros/defmacro assert
+  "spec-checking assert expression. Returns x if x is valid? according
+  to spec, else throws an error with explain-data plus ::failure of
+  :assertion-failed.
+  Can be disabled at either compile time or runtime:
+  If *compile-asserts* is false at compile time, compiles to x. Defaults
+  to the negation value of the ':elide-asserts' compiler option, or true if
+  not set.
+  If (check-asserts?) is false at runtime, always returns x. Defaults to
+  value of 'cljs.spec.alpha/*runtime-asserts*', or false if not set. You can
+  toggle check-asserts? with (check-asserts bool)."
+  [spec x]
+  `(if @#'s/*runtime-asserts*
+     (s/assert* ~spec ~x)
+     ~x))
+
+(def runtime-asserts
+  (sci/copy-var s/*runtime-asserts* sns))
+
+(defn check-asserts [v]
+  (sci/set! runtime-asserts v))
+
 (def namespaces {'cljs.spec.alpha {'def (sci/copy-var def* sns)
                                    'def-impl (sci/copy-var s/def-impl sns)
                                    'and (sci/copy-var and sns)
@@ -427,7 +449,11 @@
                                    'alt-impl (sci/copy-var s/alt-impl sns)
                                    'describe (sci/copy-var s/describe sns)
                                    'spec (sci/copy-var spec sns)
-                                   'spec-impl (sci/copy-var s/spec-impl sns)}
+                                   'spec-impl (sci/copy-var s/spec-impl sns)
+                                   'assert (sci/copy-var assert sns)
+                                   'assert* (sci/copy-var s/assert* sns)
+                                   'check-asserts (sci/copy-var check-asserts sns)
+                                   '*runtime-asserts* runtime-asserts}
                  'cljs.spec.gen.alpha {'fmap (sci/copy-var gen/fmap gns)}})
 
 (def config {:namespaces namespaces})
