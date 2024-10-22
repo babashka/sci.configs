@@ -269,7 +269,7 @@
                  (clojure.core/or min-count max-count)
                  (conj `(<= (c/or ~min-count 0)
                           (c/bounded-count (if ~max-count (inc ~max-count) ~min-count) ~gx)
-                          (c/or ~max-count MAX_INT)))
+                          (c/or ~max-count s/MAX_INT)))
 
                  distinct
                  (conj `(c/or (empty? ~gx) (apply distinct? ~gx))))]
@@ -478,6 +478,13 @@
                    (s/spec ~ret) '~(res env ret)
                    (s/spec ~fn) '~(res env fn) ~gen)))
 
+(macros/defmacro int-in
+  "Returns a spec that validates fixed precision integers in the
+  range from start (inclusive) to end (exclusive)."
+  [start end]
+  `(s/spec (s/and c/int? #(s/int-in-range? ~start ~end %))
+           :gen #(gen/large-integer* {:min ~start :max (dec ~end)})))
+
 (def namespaces {'cljs.spec.alpha {'def (sci/copy-var def* sns)
                                    'def-impl (sci/copy-var s/def-impl sns)
                                    'and (sci/copy-var and sns)
@@ -526,8 +533,15 @@
                                    'invalid? (sci/copy-var s/invalid? sns)
                                    'fdef (sci/copy-var fdef sns)
                                    'fspec (sci/copy-var fspec sns)
-                                   'fspec-impl (sci/copy-var s/fspec-impl sns) }
-                 'cljs.spec.gen.alpha {'fmap (sci/copy-var gen/fmap gns)}})
+                                   'fspec-impl (sci/copy-var s/fspec-impl sns)
+                                   'registry (sci/copy-var s/registry sns)
+                                   'int-in (sci/copy-var int-in sns)
+                                   'MAX_INT s/MAX_INT
+                                   'int-in-range? (sci/copy-var s/int-in-range? sns)}
+                 'cljs.spec.gen.alpha {'fmap (sci/copy-var gen/fmap gns)
+                                       'elements (sci/copy-var gen/elements gns)
+                                       'large-integer* (sci/copy-var gen/large-integer* gns)
+                                       'shuffle (sci/copy-var gen/shuffle gns)}})
 
 (def config {:namespaces namespaces})
 
