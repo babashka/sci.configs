@@ -1,5 +1,5 @@
 (ns sci.configs.cljs.spec.alpha
-  (:refer-clojure :exclude [and or keys])
+  (:refer-clojure :exclude [and or keys merge])
   (:require [clojure.spec.alpha :as s]
             [cljs.spec.gen.alpha :as gen]
             [sci.core :as sci]
@@ -190,6 +190,16 @@
 
 (def gns (sci/create-ns 'cljs.spec.gen.alpha))
 
+(macros/defmacro merge
+  "Takes map-validating specs (e.g. 'keys' specs) and
+  returns a spec that returns a conformed map satisfying all of the
+  specs.  Successive conformed values propagate through rest of
+  predicates. Unlike 'and', merge can generate maps satisfying the
+  union of the predicates."
+  [& pred-forms]
+  (let [&env (ctx/get-ctx)]
+    `(s/merge-spec-impl '~(mapv #(res &env %) pred-forms) ~(vec pred-forms) nil)))
+
 (def namespaces {'cljs.spec.alpha {'def (sci/copy-var def* sns)
                                    'def-impl (sci/copy-var s/def-impl sns)
                                    'and (sci/copy-var and sns)
@@ -208,7 +218,9 @@
                                    'with-gen (sci/copy-var s/with-gen sns)
                                    '& (sci/copy-var & sns)
                                    'amp-impl (sci/copy-var s/amp-impl sns)
-                                   'gen (sci/copy-var s/gen sns)}
+                                   'gen (sci/copy-var s/gen sns)
+                                   'merge (sci/copy-var merge sns)
+                                   'merge-spec-impl (sci/copy-var s/merge-spec-impl sns)}
                  'cljs.spec.gen.alpha {'fmap (sci/copy-var gen/fmap gns)}})
 
 (def config {:namespaces namespaces})
