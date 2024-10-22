@@ -24,8 +24,8 @@
 (defn- ->sym
   "Returns a symbol from a symbol or var"
   [x]
-  (if (map? x)
-    (:name x)
+  (if (var? x)
+    (symbol (str x))
     x))
 
 (defn- res [env form]
@@ -409,6 +409,75 @@
 (defn check-asserts [v]
   (sci/set! runtime-asserts v))
 
+#_(extend-protocol s/Specize
+  default
+  (specize*
+    ([o]
+     (prn :oo o)
+     (if-let [f-n (c/and (fn? o)
+                         (do
+                           (prn :o o)
+                           (#'s/fn-sym (.-name o))))]
+       (s/spec-impl f-n o nil nil)
+       (s/spec-impl ::unknown o nil nil)))
+    ([o form] (s/spec-impl form o nil nil))))
+
+(macros/defmacro fdef
+  "Takes a symbol naming a function, and one or more of the following:
+
+  :args A regex spec for the function arguments as they were a list to be
+    passed to apply - in this way, a single spec can handle functions with
+    multiple arities
+  :ret A spec for the function's return value
+  :fn A spec of the relationship between args and ret - the
+    value passed is {:args conformed-args :ret conformed-ret} and is
+    expected to contain predicates that relate those values
+
+  Qualifies fn-sym with resolve, or using *ns* if no resolution found.
+  Registers an fspec in the global registry, where it can be retrieved
+  by calling get-spec with the var or fully-qualified symbol.
+
+  Once registered, function specs are included in doc, checked by
+  instrument, tested by the runner cljs.spec.test.alpha/check, and (if
+  a macro) used to explain errors during macroexpansion.
+
+  Note that :fn specs require the presence of :args and :ret specs to
+  conform values, and so :fn specs will be ignored if :args or :ret
+  are missing.
+
+  Returns the qualified fn-sym.
+
+  For example, to register function specs for the symbol function:
+
+  (s/fdef cljs.core/symbol
+    :args (s/alt :separate (s/cat :ns string? :n string?)
+                 :str string?
+                 :sym symbol?)
+    :ret symbol?)"
+  [fn-sym & specs]
+  `(cljs.spec.alpha/def ~fn-sym (s/fspec ~@specs)))
+
+(macros/defmacro fspec
+  "takes :args :ret and (optional) :fn kwargs whose values are preds
+  and returns a spec whose conform/explain take a fn and validates it
+  using generative testing. The conformed value is always the fn itself.
+
+  See 'fdef' for a single operation that creates an fspec and
+  registers it, as well as a full description of :args, :ret and :fn
+
+  fspecs can generate functions that validate the arguments and
+  fabricate a return value compliant with the :ret spec, ignoring
+  the :fn spec if present.
+
+  Optionally takes :gen generator-fn, which must be a fn of no args
+  that returns a test.check generator."
+  [& {:keys [args ret fn gen] :or {ret `cljs.core/any?}}]
+  (let [&env (ctx/get-ctx)
+        env &env]
+    `(s/fspec-impl (s/spec ~args) '~(res env args)
+                   (s/spec ~ret) '~(res env ret)
+                   (s/spec ~fn) '~(res env fn) ~gen)))
+
 (def namespaces {'cljs.spec.alpha {'def (sci/copy-var def* sns)
                                    'def-impl (sci/copy-var s/def-impl sns)
                                    'and (sci/copy-var and sns)
@@ -453,7 +522,11 @@
                                    'assert (sci/copy-var assert sns)
                                    'assert* (sci/copy-var s/assert* sns)
                                    'check-asserts (sci/copy-var check-asserts sns)
-                                   '*runtime-asserts* runtime-asserts}
+                                   '*runtime-asserts* runtime-asserts
+                                   'invalid? (sci/copy-var s/invalid? sns)
+                                   'fdef (sci/copy-var fdef sns)
+                                   'fspec (sci/copy-var fspec sns)
+                                   'fspec-impl (sci/copy-var s/fspec-impl sns) }
                  'cljs.spec.gen.alpha {'fmap (sci/copy-var gen/fmap gns)}})
 
 (def config {:namespaces namespaces})
