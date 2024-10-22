@@ -404,7 +404,8 @@
                                    '? (sci/copy-var ? sns)
                                    'maybe-impl (sci/copy-var s/maybe-impl sns)
                                    'alt (sci/copy-var alt sns)
-                                   'alt-impl (sci/copy-var s/alt-impl sns)}
+                                   'alt-impl (sci/copy-var s/alt-impl sns)
+                                   'describe (sci/copy-var s/describe sns)}
                  'cljs.spec.gen.alpha {'fmap (sci/copy-var gen/fmap gns)}})
 
 (def config {:namespaces namespaces})
