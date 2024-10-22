@@ -1,5 +1,5 @@
 (ns sci.configs.cljs.spec.alpha
-  (:refer-clojure :exclude [and or keys merge every cat])
+  (:refer-clojure :exclude [and or keys merge every cat + ? *])
   (:require [clojure.spec.alpha :as s]
             [cljs.spec.gen.alpha :as gen]
             [sci.core :as sci]
@@ -177,7 +177,7 @@
   {:i1 42, :m {:a 1, :c 2, :d 4}, :i2 99}"
   [& kspecs]
   `(let [mspec# (s/keys ~@kspecs)]
-     (s/with-gen (s/& (* (s/cat ::s/k keyword? ::s/v cljs.core/any?)) ::s/kvs->map mspec#)
+     (s/with-gen (s/& (s/* (s/cat ::s/k keyword? ::s/v cljs.core/any?)) ::s/kvs->map mspec#)
        (fn [] (gen/fmap (fn [m#] (apply concat m#)) (s/gen mspec#))))))
 
 (macros/defmacro &
@@ -328,6 +328,45 @@
     (clojure.core/assert (clojure.core/and (even? (count key-pred-forms)) (every? keyword? keys)) "cat expects k1 p1 k2 p2..., where ks are keywords")
     `(s/cat-impl ~keys ~pred-forms '~pf)))
 
+(macros/defmacro *
+  "Returns a regex op that matches zero or more values matching
+  pred. Produces a vector of matches iff there is at least one match"
+  [pred-form]
+  (let [&env (ctx/get-ctx)]
+    `(s/rep-impl '~(res &env pred-form) ~pred-form)))
+
+(macros/defmacro +
+  "Returns a regex op that matches one or more values matching
+  pred. Produces a vector of matches"
+  [pred-form]
+  (let [&env (ctx/get-ctx)]
+    `(s/rep+impl '~(res &env pred-form) ~pred-form)))
+
+(macros/defmacro ?
+  "Returns a regex op that matches zero or one value matching
+  pred. Produces a single value (not a collection) if matched."
+  [pred-form]
+  (let [&env (ctx/get-ctx)]
+    `(s/maybe-impl ~pred-form '~(res &env pred-form))))
+
+(macros/defmacro alt
+  "Takes key+pred pairs, e.g.
+
+  (s/alt :even even? :small #(< % 42))
+
+  Returns a regex op that returns a map entry containing the key of the
+  first matching pred and the corresponding value. Thus the
+  'key' and 'val' functions can be used to refer generically to the
+  components of the tagged return."
+  [& key-pred-forms]
+  (let [&env (ctx/get-ctx)
+        pairs (partition 2 key-pred-forms)
+        keys (mapv first pairs)
+        pred-forms (mapv second pairs)
+        pf (mapv #(res &env %) pred-forms)]
+    (clojure.core/assert (clojure.core/and (even? (count key-pred-forms)) (every? keyword? keys)) "alt expects k1 p1 k2 p2..., where ks are keywords")
+    `(s/alt-impl ~keys ~pred-forms '~pf)))
+
 (def namespaces {'cljs.spec.alpha {'def (sci/copy-var def* sns)
                                    'def-impl (sci/copy-var s/def-impl sns)
                                    'and (sci/copy-var and sns)
@@ -357,7 +396,15 @@
                                    'map-of (sci/copy-var map-of sns)
                                    'every-kv (sci/copy-var every-kv sns)
                                    'cat (sci/copy-var cat sns)
-                                   'cat-impl (sci/copy-var s/cat-impl sns)}
+                                   'cat-impl (sci/copy-var s/cat-impl sns)
+                                   '* (sci/copy-var * sns)
+                                   'rep-impl (sci/copy-var s/rep-impl sns)
+                                   '+ (sci/copy-var + sns)
+                                   'rep+impl (sci/copy-var s/rep+impl sns)
+                                   '? (sci/copy-var ? sns)
+                                   'maybe-impl (sci/copy-var s/maybe-impl sns)
+                                   'alt (sci/copy-var alt sns)
+                                   'alt-impl (sci/copy-var s/alt-impl sns)}
                  'cljs.spec.gen.alpha {'fmap (sci/copy-var gen/fmap gns)}})
 
 (def config {:namespaces namespaces})
