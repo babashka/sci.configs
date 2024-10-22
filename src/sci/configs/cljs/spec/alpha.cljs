@@ -537,11 +537,15 @@
                                    'registry (sci/copy-var s/registry sns)
                                    'int-in (sci/copy-var int-in sns)
                                    'MAX_INT s/MAX_INT
-                                   'int-in-range? (sci/copy-var s/int-in-range? sns)}
+                                   'int-in-range? (sci/copy-var s/int-in-range? sns)
+                                   'nonconforming (sci/copy-var s/nonconforming sns)}
                  'cljs.spec.gen.alpha {'fmap (sci/copy-var gen/fmap gns)
                                        'elements (sci/copy-var gen/elements gns)
                                        'large-integer* (sci/copy-var gen/large-integer* gns)
-                                       'shuffle (sci/copy-var gen/shuffle gns)}})
+                                       'shuffle (sci/copy-var gen/shuffle gns)
+                                       'generate (sci/copy-var gen/generate gns)
+                                       'map (sci/copy-var gen/map gns)
+                                       'simple-type (sci/copy-var gen/simple-type gns)}})
 
 (def config {:namespaces namespaces})
 
