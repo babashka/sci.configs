@@ -89,12 +89,22 @@
     (clojure.core/assert (clojure.core/and (even? (count key-pred-forms)) (every? keyword? keys)) "spec/or expects k1 p1 k2 p2..., where ks are keywords")
     `(s/or-spec-impl ~keys '~pf ~pred-forms nil)))
 
+(macros/defmacro nilable
+  "returns a spec that accepts nil and values satisfiying pred"
+  [pred]
+  (let [&env (ctx/get-ctx)
+        pf (res &env pred)]
+    `(s/nilable-impl '~pf ~pred nil)))
+
 (def namespaces {'cljs.spec.alpha {'def (sci/copy-var def* sns)
                                    'def-impl (sci/copy-var s/def-impl sns)
                                    'and (sci/copy-var and sns)
                                    'and-spec-impl (sci/copy-var s/and-spec-impl sns)
                                    'or (sci/copy-var or sns)
                                    'or-spec-impl (sci/copy-var s/or-spec-impl sns)
-                                   'valid? (sci/copy-var s/valid? sns)}})
+                                   'valid? (sci/copy-var s/valid? sns)
+                                   'conform (sci/copy-var s/conform sns)
+                                   'nilable (sci/copy-var nilable sns)
+                                   'nilable-impl (sci/copy-var s/nilable-impl sns)}})
 
 (def config {:namespaces namespaces})
