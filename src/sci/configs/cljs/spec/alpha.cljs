@@ -1,6 +1,7 @@
 (ns sci.configs.cljs.spec.alpha
   (:refer-clojure :exclude [and or keys])
   (:require [clojure.spec.alpha :as s]
+            [cljs.spec.gen.alpha :as gen]
             [sci.core :as sci]
             [sci.ctx-store :as ctx]
             [clojure.walk :as walk])
@@ -159,6 +160,36 @@
                        :keys-pred ~keys-pred
                        :gfn ~gen})))
 
+(macros/defmacro keys*
+  "takes the same arguments as spec/keys and returns a regex op that matches sequences of key/values,
+  converts them into a map, and conforms that map with a corresponding
+  spec/keys call:
+
+  user=> (s/conform (s/keys :req-un [::a ::c]) {:a 1 :c 2})
+  {:a 1, :c 2}
+  user=> (s/conform (s/keys* :req-un [::a ::c]) [:a 1 :c 2])
+  {:a 1, :c 2}
+
+  the resulting regex op can be composed into a larger regex:
+
+  user=> (s/conform (s/cat :i1 integer? :m (s/keys* :req-un [::a ::c]) :i2 integer?) [42 :a 1 :c 2 :d 4 99])
+  {:i1 42, :m {:a 1, :c 2, :d 4}, :i2 99}"
+  [& kspecs]
+  `(let [mspec# (s/keys ~@kspecs)]
+     (s/with-gen (s/& (* (cat ::s/k keyword? ::s/v cljs.core/any?)) ::s/kvs->map mspec#)
+       (fn [] (gen/fmap (fn [m#] (apply concat m#)) (s/gen mspec#))))))
+
+(macros/defmacro &
+  "takes a regex op re, and predicates. Returns a regex-op that consumes
+  input as per re but subjects the resulting value to the
+  conjunction of the predicates, and any conforming they might perform."
+  [re & preds]
+  (let [&env (ctx/get-ctx)
+        pv (vec preds)]
+    `(s/amp-impl ~re '~(res &env re) ~pv '~(mapv #(res &env %) pv))))
+
+(def gns (sci/create-ns 'cljs.spec.gen.alpha))
+
 (def namespaces {'cljs.spec.alpha {'def (sci/copy-var def* sns)
                                    'def-impl (sci/copy-var s/def-impl sns)
                                    'and (sci/copy-var and sns)
@@ -172,6 +203,12 @@
                                    'explain (sci/copy-var s/explain sns)
                                    'explain-data (sci/copy-var s/explain-data sns)
                                    'keys (sci/copy-var keys sns)
-                                   'map-spec-impl (sci/copy-var s/map-spec-impl sns)}})
+                                   'map-spec-impl (sci/copy-var s/map-spec-impl sns)
+                                   'keys* (sci/copy-var keys* sns)
+                                   'with-gen (sci/copy-var s/with-gen sns)
+                                   '& (sci/copy-var & sns)
+                                   'amp-impl (sci/copy-var s/amp-impl sns)
+                                   'gen (sci/copy-var s/gen sns)}
+                 'cljs.spec.gen.alpha {'fmap (sci/copy-var gen/fmap gns)}})
 
 (def config {:namespaces namespaces})
