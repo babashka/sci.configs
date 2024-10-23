@@ -39,6 +39,8 @@
    sci.configs.hoplon.hoplon
    hoplon.dom
 
+   sci.configs.cljs.spec.alpha
+
    [sci.core :as sci]
    [sci.ctx-store :as store]))
 
@@ -65,7 +67,10 @@
    #'sci.configs.reagent.reagent-dom-client/config
    #'sci.configs.tonsky.datascript/config
    #'sci.configs.hoplon.javelin/config
-   #'sci.configs.hoplon.hoplon/config])
+   #'sci.configs.hoplon.hoplon/config
+   #'sci.configs.cljs.spec.alpha/config])
+
+(prn :hello2)
 
 (def sci-ctx
   (->> all-configs
