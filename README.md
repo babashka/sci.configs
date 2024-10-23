@@ -156,12 +156,21 @@ Public API:
 - `core-namespace`
 - `db-namespace`
 
-### [clojure-1-11](https://github.com/clojure/clojure/blob/master/src/clj/clojure/core.clj)
+### clojure-1-11
 
 Namespace: `clojure.core`
 
 New functions added to clojure.core in version 1.11
 
+- `namespaces`
+
+### cljs.spec.alpha
+
+Namespaces: `cljs.spec.alpha`, `cljs.spec.gen.alpha`, `cljs.spec.test.alpha`
+
+Public API:
+
+- `config`
 - `namespaces`
 
 ## Contributing
