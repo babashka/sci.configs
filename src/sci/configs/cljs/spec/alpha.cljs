@@ -27,11 +27,13 @@
       (conj (walk/postwalk-replace {s '%} form) '[%] 'cljs.core/fn))
     expr))
 
+(def sci-sym (delay (sci/eval-form (ctx/get-ctx) 'cljs.core/symbol)))
+
 (defn- ->sym
   "Returns a symbol from a symbol or var"
   [x]
   (if (instance? sci.lang.Var x)
-    (symbol (str x))
+    (@sci-sym x)
     x))
 
 (defn- res [env form]
@@ -624,9 +626,9 @@ Returns a collection of syms naming the vars instrumented."
 (macros/defmacro instrument-1
   [[_quote s] opts]
   (let [&env (ctx/get-ctx)]
-    (when-let [v (sci/resolve &env s)]
-      (let [v (meta v)
-            var-name (:name v)]
+    (when-let [vr (sci/resolve &env s)]
+      (let [v (meta vr)
+            var-name (->sym vr)]
         (when (and (nil? (:const v))
                    (nil? (:macro v))
                    (contains? (speced-vars)
@@ -635,6 +637,45 @@ Returns a collection of syms naming the vars instrumented."
                  checked# (#'stest/instrument-1* '~s the-var# ~opts)]
              (when checked# (set! ~s checked#))
              '~var-name))))))
+
+(macros/defmacro unstrument
+  "Undoes instrument on the vars named by sym-or-syms, specified
+  as in instrument. With no args, unstruments all instrumented vars.
+  Returns a collection of syms naming the vars unstrumented."
+  ([]
+   `(stest/unstrument ^::no-eval '[~@(map ->sym (c/keys (deref instrumented-vars)))]))
+  ([sym-or-syms]
+   (let [syms (sym-or-syms->syms (form->sym-or-syms sym-or-syms))]
+     `(reduce
+       (fn [ret# f#]
+         (let [sym# (f#)]
+           (cond-> ret# sym# (conj sym#))))
+       []
+       [~@(->> syms
+               (map
+                (fn [sym]
+                  (when (symbol? sym)
+                    `(fn []
+                       (stest/unstrument-1 '~sym)))))
+               (remove nil?))]))))
+
+(macros/defmacro unstrument-1
+  [[_quote s]]
+  (let [&env (ctx/get-ctx)]
+    (when-let [v (sci/resolve &env s)]
+      (when (@instrumented-vars v)
+        `(let [raw# (#'stest/unstrument-1* '~s (var ~s))]
+           (when raw# (set! ~s raw#))
+           '~s)))))
+
+(defn- unstrument-1*
+  [_s v]
+  (when v
+    (when-let [{:keys [raw wrapped]} (get @instrumented-vars v)]
+      (swap! instrumented-vars dissoc v)
+      (let [current @v]
+        (when (= wrapped current)
+          raw)))))
 
 (def namespaces {'cljs.spec.alpha {'def (sci/copy-var def* sns)
                                    'def-impl (sci/copy-var s/def-impl sns)
@@ -702,7 +743,10 @@ Returns a collection of syms naming the vars instrumented."
                                         'distinct-by (sci/copy-var stest/distinct-by tns)
                                         'instrumentable-syms (sci/copy-var stest/instrumentable-syms tns)
                                         'instrument-1 (sci/copy-var instrument-1 tns)
-                                        'instrument-1* (sci/copy-var instrument-1* tns)}})
+                                        'instrument-1* (sci/copy-var instrument-1* tns)
+                                        'unstrument (sci/copy-var unstrument tns)
+                                        'unstrument-1 (sci/copy-var unstrument-1 tns)
+                                        'unstrument-1* (sci/copy-var unstrument-1* tns)}})
 
 (def config {:namespaces namespaces})
 
