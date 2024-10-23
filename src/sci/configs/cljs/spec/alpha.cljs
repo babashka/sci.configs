@@ -5,7 +5,8 @@
             [sci.core :as sci]
             [sci.ctx-store :as ctx]
             [clojure.walk :as walk]
-            [clojure.core :as c])
+            [clojure.core :as c]
+            [sci.lang])
   (:require-macros [sci.configs.macros :as macros]))
 
 (def sns (sci/create-ns 'cljs.spec.alpha nil))
@@ -24,7 +25,7 @@
 (defn- ->sym
   "Returns a symbol from a symbol or var"
   [x]
-  (if (var? x)
+  (if (instance? sci.lang.Var x)
     (symbol (str x))
     x))
 
