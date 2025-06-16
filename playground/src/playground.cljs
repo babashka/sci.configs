@@ -27,6 +27,7 @@
    ;sci.configs.clojure.test
    sci.configs.fulcro.fulcro
    sci.configs.funcool.promesa
+   sci.configs.metosin.reitit
    sci.configs.mfikes.cljs-bean
    sci.configs.re-frame.re-frame
    sci.configs.re-frame.re-frame-alpha
@@ -61,6 +62,7 @@
    ;#'sci.configs.clojure.test/config
    #'sci.configs.fulcro.fulcro/config
    #'sci.configs.funcool.promesa/config
+   #'sci.configs.metosin.reitit/config
    #'sci.configs.mfikes.cljs-bean/config
    #'sci.configs.re-frame.re-frame/config
    #'sci.configs.re-frame.re-frame-alpha/config

@@ -80,6 +80,17 @@ Public API:
 - `promesa-protocols-namespace`
 - `namespaces`
 
+### [metosin/reitit](https://github.com/metosin/reitit)
+
+Namespace: `sci.configs.metosin.reitit`
+
+Public API:
+
+- `config`
+- `frontend-namespace`
+- `frontend-easy-namespace`
+- `namespaces`
+
 ### [reagent/reagent](https://github.com/reagent-project/reagent)
 
 Namespace: `sci.configs.reagent.reagent`

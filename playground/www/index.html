@@ -26,6 +26,7 @@
         [reagent.debug]
         [replicant.dom :as replicant]
         [reagent.ratom :as ratom]
+        [reitit.frontend :as reitit]
         [datascript.core :as d]
         [datascript.db :as d.db]
         [com.fulcrologic.fulcro.application :as app]
@@ -33,6 +34,12 @@
         [com.fulcrologic.fulcro.dom :as dom]
         [javelin.core :as jc]))
 
+(def router
+  (reitit/router
+    [["/api/ping" ::ping]
+     ["/api/orders/:id" ::order]]))
+(reitit/match-by-path router "/api/ping")
+        
 (defsc Root [this props]
  (dom/div (dom/h3 "Hello from SCI!")
    (dom/p "Here you can play with Fulcro and Reagent apps and much more!")))
