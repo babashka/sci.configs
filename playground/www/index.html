@@ -24,6 +24,7 @@
         [reagent.dom.server :as rds]
         [reagent.dom.client :as rdc]
         [reagent.debug]
+        [replicant.dom :as replicant]
         [reagent.ratom :as ratom]
         [reitit.frontend :as reitit]
         [datascript.core :as d]
@@ -32,16 +33,19 @@
         [com.fulcrologic.fulcro.components :as comp :refer [defsc]]
         [com.fulcrologic.fulcro.dom :as dom]
         [javelin.core :as jc]))
+
 (def router
   (reitit/router
     [["/api/ping" ::ping]
      ["/api/orders/:id" ::order]]))
 (reitit/match-by-path router "/api/ping")
         
-    (defsc Root [this props]
-     (dom/div (dom/h3 "Hello from SCI!")
-       (dom/p "Here you can play with Fulcro and Reagent apps and much more!")))
-    (app/mount! (app/fulcro-app) Root "app")
+(defsc Root [this props]
+ (dom/div (dom/h3 "Hello from SCI!")
+   (dom/p "Here you can play with Fulcro and Reagent apps and much more!")))
+(app/mount! (app/fulcro-app) Root "app")
+
+(replicant/render (.getElementById js/document "app") [:h1 "Hello Replicant!"])
     </code></pre>
   <div id="app" style="border: 1px dashed; padding: 0.4rem">
     <em>You can use this <code>&lt;div id="app"&gt;</code> to render DOM.</em>

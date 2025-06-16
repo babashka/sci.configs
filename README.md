@@ -59,6 +59,16 @@ Public API:
 - `config`
 - `namespaces`
 
+### [cjohansen/replicant](https://github.com/cjohansen/replicant)
+
+Namespace: `sci.configs.cjohansen.replicant`
+
+Public API:
+
+- `config`
+- `replicant-dom-namespace`
+- `namespaces`
+
 ### [funcool/promesa](https://github.com/funcool/promesa)
 
 Namespace: `sci.configs.funcool.promesa`
@@ -128,7 +138,6 @@ Public API:
 
 - `config`
 - `re-frame-alpha-namespace`
-
 
 ### [mfikes/cljs-bean](https://github.com/mfikes/cljs-bean)
 
