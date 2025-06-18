@@ -25,6 +25,8 @@
         [reagent.dom.client :as rdc]
         [reagent.debug]
         [replicant.dom :as replicant]
+        [portfolio.replicant :refer-macros [defscene]]
+        [portfolio.ui :as portfolio]
         [reagent.ratom :as ratom]
         [reitit.frontend :as reitit]
         [datascript.core :as d]
@@ -39,6 +41,9 @@
     [["/api/ping" ::ping]
      ["/api/orders/:id" ::order]]))
 (reitit/match-by-path router "/api/ping")
+
+(defscene hello
+  [:h1 "hello Portfolio"])
         
 (defsc Root [this props]
  (dom/div (dom/h3 "Hello from SCI!")

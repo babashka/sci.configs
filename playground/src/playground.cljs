@@ -20,6 +20,7 @@
    ;; All the configs
    sci.configs.applied-science.js-interop
    sci.configs.cjohansen.replicant
+   sci.configs.cjohansen.portfolio.replicant   
    sci.configs.cljs.pprint
    sci.configs.cljs.test
    ; sci.configs.clojure-1-11
@@ -57,6 +58,7 @@
 (def all-configs ; vars so that we can extract ns info
   [#'sci.configs.applied-science.js-interop/config
    #'sci.configs.cjohansen.replicant/config
+   #'sci.configs.cjohansen.portfolio.replicant/config
    #'sci.configs.cljs.pprint/config
    #'sci.configs.cljs.test/config
    ;#'sci.configs.clojure.test/config

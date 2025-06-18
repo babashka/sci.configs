@@ -7,6 +7,7 @@
   funcool/promesa {:git/url "https://github.com/funcool/promesa"
                    :git/sha "e503874b154224ce85b223144e80b697df91d18e"}
   no.cjohansen/replicant {:mvn/version "2025.03.27"}
+  no.cjohansen/portfolio {:mvn/version "2025.01.28"}
   reagent/reagent {:mvn/version "1.2.0"}
   metosin/reitit {:mvn/version "0.9.1"}
   re-frame/re-frame {:mvn/version "1.4.0"}
