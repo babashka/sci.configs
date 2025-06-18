@@ -20,6 +20,7 @@
     "shadow-cljs": "^2.25.7"
   },
   "dependencies": {
+    "snabbdom": "3.5.1",
     "w3c-keyname": "^2.2.4"
   }
 }
