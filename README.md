@@ -67,6 +67,8 @@ Public API:
 
 - `config`
 - `replicant-dom-namespace`
+- `replicant-string-namespace`
+- `replicant-alias-namespace`
 - `namespaces`
 
 ### [funcool/promesa](https://github.com/funcool/promesa)
