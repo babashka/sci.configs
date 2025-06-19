@@ -9,4 +9,5 @@
             :main-opts ["-m" "cljs-test-runner.main" "-d" "test"]}
            :cljs-test-runner-advanced
            {:main-opts ["-m" "cljs-test-runner.main" "-d" "test" "-c" "{:optimizations :advanced :language-in :ecmascript-next}"]}}
- :deps {}}
+ :deps {org.babashka/sci {:mvn/version "0.10.46"} #_{:git/url "https://github.com/babashka/sci"
+                          :git/sha "7854f77ea5ff9cde2aeec06ff189b04316be9a92"}}}

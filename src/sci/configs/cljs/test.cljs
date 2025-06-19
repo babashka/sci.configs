@@ -933,7 +933,7 @@
    (fn [[ns vars]]
      (fn []
        (let [ns (symbol (str ns))
-             ni (sci-namespaces/sci-ns-interns (store/get-ctx) ns)
+             ni (sci-namespaces/sci-ns-interns* (store/get-ctx) ns)
              _ (when-let [fs (get ni 'cljs-test-once-fixtures)]
                  (update-current-env! [:once-fixtures] assoc ns
                                       @fs))
@@ -978,7 +978,7 @@
 (defn test-all-vars-block
   ([ns]
    (let [env (get-current-env)
-         ni (sci-namespaces/sci-ns-interns (store/get-ctx) ns)]
+         ni (sci-namespaces/sci-ns-interns* (store/get-ctx) ns)]
      (concat
       [(fn []
          (when (nil? env)
@@ -990,7 +990,7 @@
            (update-current-env! [:each-fixtures] assoc ns
                                 @fs)))]
       (test-vars-block
-       (let [vars (vals (sci-namespaces/sci-ns-interns (store/get-ctx) ns))
+       (let [vars (vals (sci-namespaces/sci-ns-interns* (store/get-ctx) ns))
              tests (filter (fn [var] (:test (meta var))) vars)
              sorted (sort-by (fn [var] (:line (meta var))) tests)]
          sorted))
