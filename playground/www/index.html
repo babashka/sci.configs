@@ -31,6 +31,7 @@
         [reitit.frontend :as reitit]
         [datascript.core :as d]
         [datascript.db :as d.db]
+        [dataspex.core :as dataspex]
         [com.fulcrologic.fulcro.application :as app]
         [com.fulcrologic.fulcro.components :as comp :refer [defsc]]
         [com.fulcrologic.fulcro.dom :as dom]
@@ -48,7 +49,12 @@
 (defsc Root [this props]
  (dom/div (dom/h3 "Hello from SCI!")
    (dom/p "Here you can play with Fulcro and Reagent apps and much more!")))
-(app/mount! (app/fulcro-app) Root "app")
+
+(def my-fulcro-app (app/fulcro-app))
+(app/mount! my-fulcro-app Root "app")
+
+;; Inspect anything with dataspex (make sure to install the browser extension https://github.com/cjohansen/dataspex/tree/main?tab=readme-ov-file#chrome-extension)
+(dataspex/inspect "My fulcro app" my-fulcro-app)
 
 (replicant/render (.getElementById js/document "app") [:h1 "Hello Replicant!"])
     </code></pre>
