@@ -4,6 +4,8 @@
   com.fulcrologic/fulcro {:mvn/version "3.6.10"}
   funcool/promesa {:git/url "https://github.com/funcool/promesa"
                    :git/sha "e503874b154224ce85b223144e80b697df91d18e"}
+  no.cjohansen/dataspex {:git/url "https://github.com/cjohansen/dataspex"
+                         :git/sha "02112200651c2bd932907bb69fba1ff50b881741"}
   no.cjohansen/replicant {:mvn/version "2025.03.27"}
   no.cjohansen/portfolio {:mvn/version "2025.01.28"}
   reagent/reagent {:mvn/version "1.2.0"}

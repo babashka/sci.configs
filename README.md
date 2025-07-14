@@ -59,6 +59,17 @@ Public API:
 - `config`
 - `namespaces`
 
+### [cjohansen/dataspex](https://github.com/cjohansen/dataspex)
+
+Namespace: `sci.configs.cjohansen.dataspex`
+
+Public API:
+
+- `config`
+- `dataspex-core-namespace`
+- `namespaces`
+
+
 ### [cjohansen/replicant](https://github.com/cjohansen/replicant)
 
 Namespace: `sci.configs.cjohansen.replicant`

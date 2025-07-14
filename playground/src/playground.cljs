@@ -19,6 +19,7 @@
    [promesa.core :as p]
    ;; All the configs
    sci.configs.applied-science.js-interop
+   sci.configs.cjohansen.dataspex
    sci.configs.cjohansen.replicant
    sci.configs.cjohansen.portfolio.replicant   
    sci.configs.cljs.pprint
@@ -57,6 +58,7 @@
 
 (def all-configs ; vars so that we can extract ns info
   [#'sci.configs.applied-science.js-interop/config
+   #'sci.configs.cjohansen.dataspex/config
    #'sci.configs.cjohansen.replicant/config
    #'sci.configs.cjohansen.portfolio.replicant/config
    #'sci.configs.cljs.pprint/config
