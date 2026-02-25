@@ -2,12 +2,18 @@
                  :extra-deps {thheller/shadow-cljs {:mvn/version "2.25.7"}}}
            :shadow-cli {:main-opts ["-m" "shadow.cljs.devtools.cli"]}
            :test {:extra-paths ["test"]
-                  :extra-deps {sci.configs/test-deps {:local/root "test-deps"}}}
+                  :extra-deps {sci.configs/test-deps {:local/root "test-deps"}}}                  
            :cljs-test-runner
            {:extra-deps {olical/cljs-test-runner {:mvn/version "3.8.0"}}
             :extra-paths ["test" "cljs-test-runner-out/gen"]
             :main-opts ["-m" "cljs-test-runner.main" "-d" "test"]}
            :cljs-test-runner-advanced
-           {:main-opts ["-m" "cljs-test-runner.main" "-d" "test" "-c" "{:optimizations :advanced :language-in :ecmascript-next}"]}}
+           {:main-opts ["-m" "cljs-test-runner.main" "-d" "test" "-c" "{:optimizations :advanced :language-in :ecmascript-next}"]}
+           :test-clj {:extra-paths ["test"]
+                      :extra-deps {io.github.cognitect-labs/test-runner 
+                                   {:git/tag "v0.5.1" :git/sha "dfb30dd"}
+                                 sci.configs/test-deps {:local/root "test-deps"}}
+                      :main-opts ["-m" "cognitect.test-runner"]
+                      :exec-fn cognitect.test-runner.api/test}}
  :deps {org.babashka/sci {:mvn/version "0.10.46"} #_{:git/url "https://github.com/babashka/sci"
                           :git/sha "7854f77ea5ff9cde2aeec06ff189b04316be9a92"}}}

@@ -1,6 +1,8 @@
 {:tasks
  {cljs-repl (shell "clj -M:test -m cljs.main -re node")
-  test (clojure "-M:test:cljs-test-runner")
+  test-cljs (clojure "-M:test:cljs-test-runner")
+  test-clj (clojure "-X:test-clj")
+  test {:depends [test-cljs test-clj]}
   test:advanced (clojure "-M:test:cljs-test-runner:cljs-test-runner-advanced")
   dev (clojure "-M:test:dev:shadow-cli watch dev")
   dev:release (clojure "-M:test:dev:shadow-cli release dev")
