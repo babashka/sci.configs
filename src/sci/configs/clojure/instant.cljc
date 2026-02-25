@@ -7,3 +7,7 @@
 (def instant-namespace
   {'read-instant-date (sci/copy-var i/read-instant-date ins)
    'parse-timestamp (sci/copy-var i/parse-timestamp ins)})
+   
+(def namespaces {'clojure.instant instant-namespace})
+
+(def config {:namespaces namespaces})
