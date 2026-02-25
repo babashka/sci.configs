@@ -10,3 +10,8 @@
 (def datafy-namespace
   {'datafy (sci/copy-var protocols/datafy datafy-ns)
    'nav (sci/copy-var protocols/nav datafy-ns)})
+   
+(def namespaces {'clojure.datafy datafy-namespace
+                 'clojure.core.protocols protocols/protocols-namespace})
+
+(def config {:namespaces namespaces})
