@@ -1,6 +1,7 @@
 (ns sci.configs.cjohansen.replicant
   (:require [replicant.alias :as ra]
             [replicant.dom :as rd]
+            [replicant.hiccup]
             [replicant.string :as rs]
             [sci.core :as sci]
             [replicant.assert :as assert]))
@@ -11,6 +12,8 @@
   {'render (sci/copy-var rd/render rdns)
    'unmount (sci/copy-var rd/unmount rdns)
    'set-dispatch! (sci/copy-var rd/set-dispatch! rdns)})
+
+(def replicant-hiccup-namespace (sci/copy-ns replicant.hiccup (sci/create-ns 'replicant.hiccup nil)))
 
 (def rsns (sci/create-ns 'replicant.string nil))
 
@@ -77,6 +80,7 @@
   (sci/copy-ns replicant.assert (sci/create-ns 'replicant.assert nil)))
 
 (def namespaces {'replicant.dom replicant-dom-namespace
+                 'replicant.hiccup replicant-hiccup-namespace
                  'replicant.string replicant-string-namespace
                  'replicant.alias replicant-alias-namespace
                  'replicant.assert replicant-assert-namespace})
